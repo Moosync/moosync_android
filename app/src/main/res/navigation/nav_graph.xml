@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/songsList">
+
+    <fragment
+        android:id="@+id/songsList"
+        android:name="app.moosync.moosync.ui.pages.songs.SongsList"
+        android:label="fragment_songs_list"
+        tools:layout="@layout/fragment_songs_list" />
+</navigation>
