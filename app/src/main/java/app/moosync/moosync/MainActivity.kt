@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-//                super.onPlaybackStateChanged(state)
+                super.onPlaybackStateChanged(state)
                 Log.d("TAG", "onPlaybackStateChanged: state changed to $state")
             }
         })

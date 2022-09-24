@@ -48,6 +48,11 @@ class MediaPlayerCallback(private val mContext: Context, private val callbacks: 
         }
     }
 
+    override fun onCustomAction(action: String?, extras: Bundle?) {
+        Log.d("TAG", "onCustomAction: $action")
+        super.onCustomAction(action, extras)
+    }
+
     private fun notifyPlaybackStateChange() {
         callbacks.onPlaybackStateChange(playbackManager.isPlaying, playbackManager.songProgress)
     }

@@ -12,6 +12,8 @@ import androidx.media.MediaBrowserServiceCompat
 import app.moosync.moosync.BuildConfig
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.models.Song
+import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
+import app.moosync.moosync.utils.services.Actions.ACTION_SHUFFLE
 import app.moosync.moosync.utils.services.Actions.PLAYBACK_STATE_ACTIONS
 
 class MediaPlayerService : MediaBrowserServiceCompat() {
@@ -71,6 +73,7 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
                 playbackStateCompatBuilder
                     .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1F)
                     .setActions(PLAYBACK_STATE_ACTIONS)
+                    .addCustomAction(PlaybackStateCompat.CustomAction.Builder(ACTION_SHUFFLE, "Shuffle", R.drawable.ic_baseline_shuffle_48).build())
                     .build()
             )
             notificationManager.updateMetadata()

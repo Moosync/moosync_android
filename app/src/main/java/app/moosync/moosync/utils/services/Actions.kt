@@ -14,6 +14,7 @@ object Actions {
     const val ACTION_REWIND = "$MOOSYNC_PACKAGE_NAME.rewind"
     const val ACTION_QUIT = "$MOOSYNC_PACKAGE_NAME.quitservice"
     const val ACTION_PENDING_QUIT = "$MOOSYNC_PACKAGE_NAME.pendingquitservice"
+    const val ACTION_SHUFFLE = "$MOOSYNC_PACKAGE_NAME.shuffle"
 
     const val PLAYBACK_STATE_ACTIONS = (PlaybackStateCompat.ACTION_PLAY
     or PlaybackStateCompat.ACTION_PAUSE
