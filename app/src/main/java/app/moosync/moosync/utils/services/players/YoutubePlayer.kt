@@ -8,7 +8,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.You
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
-class YoutubePlayer(mContext: Context): GenericPlayer() {
+class YoutubePlayer(mContext: Context) : GenericPlayer() {
     private val _playerView = YouTubePlayerView(mContext)
     private var playerInstance: YouTubePlayer? = null
     private var isInitialized = false
@@ -18,7 +18,6 @@ class YoutubePlayer(mContext: Context): GenericPlayer() {
         _playerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
             override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
                 playerInstance = youTubePlayer
-                playerInstance!!.addListener(playerListeners)
                 isInitialized = true
             }
         })
@@ -27,12 +26,15 @@ class YoutubePlayer(mContext: Context): GenericPlayer() {
     private var _progress = 0
     override var progress: Int
         get() = _progress
-        set(value) { playerInstance?.seekTo(value.toFloat()) }
+        set(value) {
+            playerInstance?.seekTo(value.toFloat())
+        }
 
 
     private var _isPlaying: Boolean = false
     override val isPlaying: Boolean
         get() = _isPlaying
+
 
     private fun isVideoId(videoId: Any): String? {
         if (videoId is String && videoId.length == 11) return videoId
@@ -63,35 +65,42 @@ class YoutubePlayer(mContext: Context): GenericPlayer() {
     }
 
     override fun release() {
+        Log.d("TAG", "release: releasing view")
         _playerView.release()
     }
 
-    val playerListeners: YouTubePlayerListener = object : YouTubePlayerListener {
-        override fun onApiChange(youTubePlayer: YouTubePlayer) {
-            Log.d("TAG", "onApiChange")
+    private var youtubePlayerListener: YoutubePlayerListener? = null
+
+    override fun setPlayerListeners(playerListeners: PlayerListeners) {
+        youtubePlayerListener = YoutubePlayerListener(playerListeners)
+        playerInstance?.addListener(youtubePlayerListener!!)
+    }
+
+    override fun removePlayerListeners() {
+        if (youtubePlayerListener != null) {
+            playerInstance?.removeListener(youtubePlayerListener!!)
         }
+    }
+
+    inner class YoutubePlayerListener(private val playerListeners: PlayerListeners) :
+        YouTubePlayerListener {
+        override fun onApiChange(youTubePlayer: YouTubePlayer) {}
 
         override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
             _progress = second.toInt()
         }
 
-        override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-            Log.d("TAG", "onError $error")
-        }
+        override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {}
 
         override fun onPlaybackQualityChange(
             youTubePlayer: YouTubePlayer,
             playbackQuality: PlayerConstants.PlaybackQuality
-        ) {
-            Log.d("TAG", "onPlaybackQualityChange $playbackQuality")
-        }
+        ) {}
 
         override fun onPlaybackRateChange(
             youTubePlayer: YouTubePlayer,
             playbackRate: PlayerConstants.PlaybackRate
-        ) {
-            Log.d("TAG", "onPlaybackRateChange $playbackRate")
-        }
+        ) {}
 
         override fun onReady(youTubePlayer: YouTubePlayer) {}
 
@@ -102,7 +111,10 @@ class YoutubePlayer(mContext: Context): GenericPlayer() {
             _isPlaying = when (state) {
                 PlayerConstants.PlayerState.UNKNOWN -> false
                 PlayerConstants.PlayerState.UNSTARTED -> false
-                PlayerConstants.PlayerState.ENDED -> false
+                PlayerConstants.PlayerState.ENDED -> {
+                    playerListeners.onSongEnded()
+                    false
+                }
                 PlayerConstants.PlayerState.PLAYING -> true
                 PlayerConstants.PlayerState.PAUSED -> false
                 PlayerConstants.PlayerState.BUFFERING -> false
@@ -110,17 +122,10 @@ class YoutubePlayer(mContext: Context): GenericPlayer() {
             }
         }
 
-        override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-            Log.d("TAG", "onVideoDuration $duration")
-        }
+        override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {}
 
-        override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
-            Log.d("TAG", "onVideoId $videoId")
-        }
+        override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {}
 
-        override fun onVideoLoadedFraction(
-            youTubePlayer: YouTubePlayer,
-            loadedFraction: Float
-        ) {}
+        override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {}
     }
 }

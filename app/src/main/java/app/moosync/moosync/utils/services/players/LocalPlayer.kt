@@ -6,7 +6,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.provider.MediaStore
 
-class LocalPlayer: GenericPlayer() {
+class LocalPlayer : GenericPlayer() {
     private val playerInstance = MediaPlayer()
 
     override var progress: Int
@@ -16,6 +16,7 @@ class LocalPlayer: GenericPlayer() {
 
     override val isPlaying: Boolean
         get() = playerInstance.isPlaying
+
 
     override fun canPlayData(data: Any): Boolean {
         return data is Uri
@@ -39,6 +40,16 @@ class LocalPlayer: GenericPlayer() {
 
         playerInstance.setOnPreparedListener { it.start() }
         playerInstance.prepareAsync()
+    }
+
+    override fun setPlayerListeners(playerListeners: PlayerListeners) {
+        playerInstance.setOnCompletionListener {
+            playerListeners.onSongEnded()
+        }
+    }
+
+    override fun removePlayerListeners() {
+        playerInstance.setOnCompletionListener(null)
     }
 
     override fun play() {

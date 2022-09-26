@@ -17,20 +17,19 @@ import com.bumptech.glide.load.model.ModelLoader.LoadData
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException
 import org.jaudiotagger.audio.mp3.MP3File
-import org.jaudiotagger.tag.TagException
 import org.jaudiotagger.tag.images.Artwork
 import java.io.*
 
 
-internal class AudioCoverLoader(private val mContext: Context): ModelLoader<AudioCover, InputStream> {
+internal class AudioCoverLoader(private val mContext: Context) :
+    ModelLoader<AudioCover, InputStream> {
     fun getResourceFetcher(model: AudioCover, width: Int, height: Int): DataFetcher<InputStream> {
         return AudioCoverFetcher(model, mContext, width, height)
     }
 
-    internal class Factory(private val mContext: Context) : ModelLoaderFactory<AudioCover, InputStream> {
+    internal class Factory(private val mContext: Context) :
+        ModelLoaderFactory<AudioCover, InputStream> {
         override fun teardown() {}
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<AudioCover, InputStream> {
             return AudioCoverLoader(mContext)
@@ -54,7 +53,12 @@ internal class AudioCoverLoader(private val mContext: Context): ModelLoader<Audi
     }
 }
 
-internal class AudioCoverFetcher(private val model: AudioCover, private val mContext: Context, private val height: Int, private val width: Int) : DataFetcher<InputStream> {
+internal class AudioCoverFetcher(
+    private val model: AudioCover,
+    private val mContext: Context,
+    private val height: Int,
+    private val width: Int
+) : DataFetcher<InputStream> {
     private var stream: FileInputStream? = null
     private val id: Long
         get() = model.id
@@ -128,24 +132,24 @@ internal class AudioCoverFetcher(private val model: AudioCover, private val mCon
         }
 
         val retriever = MediaMetadataRetriever()
-            try {
-                retriever.setDataSource(mContext, uri)
-                val picture = retriever.embeddedPicture
-                return picture?.let { ByteArrayInputStream(it) }
-                    ?: fallback(uri)
-            } finally {
-                retriever.release()
-            }
+        try {
+            retriever.setDataSource(mContext, uri)
+            val picture = retriever.embeddedPicture
+            return picture?.let { ByteArrayInputStream(it) }
+                ?: fallback(uri)
+        } finally {
+            retriever.release()
+        }
 
     }
 
 
-     override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream?>) {
-         val cover = getCoverImg(priority)
-         if (cover == null) {
-             callback.onLoadFailed(Exception("Failed to load image"))
-         } else {
-             callback.onDataReady(cover)
-         }
+    override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream?>) {
+        val cover = getCoverImg(priority)
+        if (cover == null) {
+            callback.onLoadFailed(Exception("Failed to load image"))
+        } else {
+            callback.onDataReady(cover)
+        }
     }
 }

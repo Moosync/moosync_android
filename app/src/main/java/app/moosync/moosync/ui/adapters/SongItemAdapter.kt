@@ -1,6 +1,5 @@
 package app.moosync.moosync.ui.adapters
 
-import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.SongListItemBinding

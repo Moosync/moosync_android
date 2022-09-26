@@ -1,21 +1,14 @@
 package app.moosync.moosync.utils.services
 
 import android.content.Context
-import android.media.MediaPlayer
-import android.net.Uri
-import android.util.Log
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.players.GenericPlayer
 import app.moosync.moosync.utils.services.players.LocalPlayer
+import app.moosync.moosync.utils.services.players.PlayerListeners
 import app.moosync.moosync.utils.services.players.YoutubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
-class PlaybackManager private constructor(mContext: Context) {
+class PlaybackManager(mContext: Context, private val playerListeners: PlayerListeners) {
     private val players: HashMap<PlayerTypes, GenericPlayer> = hashMapOf(Pair(PlayerTypes.LOCAL, LocalPlayer()), Pair(PlayerTypes.YOUTUBE, YoutubePlayer(mContext)))
 
     private var activePlayerType: PlayerTypes = PlayerTypes.LOCAL
@@ -27,28 +20,30 @@ class PlaybackManager private constructor(mContext: Context) {
     set(value) { activePlayer.progress = value }
 
     val isPlaying: Boolean
-        get() { return activePlayer.isPlaying }
-
-
-    companion object {
-        private lateinit var INSTANCE: PlaybackManager
-        private var isInitialized = false
-
-        operator fun invoke(mContext: Context): PlaybackManager {
-            if (!isInitialized) {
-                INSTANCE = PlaybackManager(mContext)
-                isInitialized = true
-            }
-            return INSTANCE
-        }
-    }
+        get() = activePlayer.isPlaying
 
     fun stop() {
         activePlayer.stop()
     }
 
     fun release() {
-        activePlayer.release()
+        players.forEach {
+            it.value.release()
+        }
+    }
+
+    fun pause() {
+        activePlayer.pause()
+    }
+
+    fun play() {
+        activePlayer.play()
+    }
+
+    private fun switchActivePlayer(newType: PlayerTypes) {
+        activePlayer.removePlayerListeners()
+        activePlayerType = newType
+        activePlayer.setPlayerListeners(playerListeners)
     }
 
     fun loadData(mContext: Context, data: Any) {
@@ -56,13 +51,13 @@ class PlaybackManager private constructor(mContext: Context) {
 
         if (data is Song) {
             if (data.playbackUrl != null) {
-                activePlayerType = data.type
+                switchActivePlayer(data.type)
                 activePlayer.load(mContext, data.playbackUrl)
             }
         } else {
             for (p in players) {
                 if (p.value.canPlayData(data)) {
-                    activePlayerType = p.key
+                    switchActivePlayer(p.key)
                     break
                 }
             }

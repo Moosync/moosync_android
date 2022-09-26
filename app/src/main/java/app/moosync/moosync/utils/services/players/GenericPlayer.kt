@@ -13,4 +13,11 @@ abstract class GenericPlayer {
 
     abstract var progress: Int
     abstract val isPlaying: Boolean
+
+    abstract fun setPlayerListeners(playerListeners: PlayerListeners)
+    abstract fun removePlayerListeners()
+}
+
+interface PlayerListeners {
+    fun onSongEnded()
 }

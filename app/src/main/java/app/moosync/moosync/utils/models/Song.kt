@@ -41,10 +41,6 @@ data class Song(
         )
     }
 
-    override fun toString(): String {
-        return super.toString()
-    }
-
     companion object {
         fun fromDatabaseEntity(item: RoomSongItem): Song {
             return Song(

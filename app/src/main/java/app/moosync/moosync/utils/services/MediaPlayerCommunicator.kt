@@ -2,20 +2,31 @@ package app.moosync.moosync.utils.services
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
-import app.moosync.moosync.utils.Constants
+import android.util.Log
 import app.moosync.moosync.utils.models.Song
+import app.moosync.moosync.utils.services.players.PlayerListeners
 
 class MediaPlayerCommunicator(private val mContext: Context, private val callbacks: PlaybackStateChangeCallback): MediaSessionCompat.Callback() {
-    private val playbackManager = PlaybackManager(mContext)
+    private val playerListeners = object : PlayerListeners {
+        override fun onSongEnded() {
+            callbacks.onSongEnded()
+        }
+    }
+
+    private val playbackManager = PlaybackManager(mContext, playerListeners)
+
+    val isPlaying: Boolean
+        get() = playbackManager.isPlaying
 
     override fun onPlay() {
+        playbackManager.play()
         notifyPlaybackStateChange()
     }
 
     override fun onPause() {
+        playbackManager.pause()
         notifyPlaybackStateChange()
     }
 
@@ -33,22 +44,9 @@ class MediaPlayerCommunicator(private val mContext: Context, private val callbac
         playbackManager.loadData(mContext, uri)
     }
 
-    private fun loadCustomSong(bundle: Bundle?) {
-        val song = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle?.getSerializable(Constants.BUNDLE_SONG_KEY, Song::class.java)
-        } else {
-            bundle?.getSerializable(Constants.BUNDLE_SONG_KEY) as Song
-        } ?: Song.emptySong
-
+    fun loadSong(song: Song) {
         playbackManager.loadData(mContext, song)
         callbacks.onSongChange(song)
-    }
-
-    override fun onCustomAction(action: String?, extras: Bundle?) {
-        when (action) {
-            Constants.TRANSPORT_CONTROL_PLAY_SONG -> loadCustomSong(extras)
-            else -> super.onCustomAction(action, extras)
-        }
     }
 
     private fun notifyPlaybackStateChange() {
@@ -56,12 +54,14 @@ class MediaPlayerCommunicator(private val mContext: Context, private val callbac
     }
 
     fun release() {
+        Log.d("TAG", "release: Releasing communicator")
         playbackManager.release()
     }
 
     interface PlaybackStateChangeCallback {
         fun onSongChange(song: Song)
         fun onPlaybackStateChange(isPlaying: Boolean, position: Int)
+        fun onSongEnded()
     }
 }
 
