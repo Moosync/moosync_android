@@ -1,6 +1,7 @@
 package app.moosync.moosync.utils.db
 
 import androidx.room.*
+import app.moosync.moosync.utils.PlayerTypes
 
 @Entity(tableName = "all_songs")
 class SongEntity(
@@ -19,6 +20,12 @@ class SongEntity(
 
     @ColumnInfo("date_modified")
     val dateModified: Long,
+
+    @ColumnInfo("playback_url")
+    val playbackUrl: String?,
+
+    @ColumnInfo("type")
+    val type: PlayerTypes
 )
 
 @Entity(primaryKeys = ["song_id", "artist_id"])

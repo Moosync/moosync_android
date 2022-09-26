@@ -13,7 +13,8 @@ import androidx.fragment.app.activityViewModels
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.SongItemAdapter
-import app.moosync.moosync.utils.services.BundleConstants
+import app.moosync.moosync.utils.Constants
+import app.moosync.moosync.utils.Constants.TRANSPORT_CONTROL_PLAY_SONG
 import app.moosync.moosync.utils.viewModels.SongsViewModel
 
 class SongsList : Fragment() {
@@ -28,12 +29,8 @@ class SongsList : Fragment() {
 
         val adapter = SongItemAdapter {
             val bundle = Bundle()
-            bundle.putLong(BundleConstants.BUNDLE_SONG_ID_KEY, it._id)
-            MediaControllerCompat.getMediaController(requireActivity()).transportControls.playFromUri(
-                ContentUris.withAppendedId(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    it._id
-                ), bundle)
+            bundle.putSerializable(Constants.BUNDLE_SONG_KEY, it)
+            MediaControllerCompat.getMediaController(requireActivity()).transportControls.sendCustomAction(TRANSPORT_CONTROL_PLAY_SONG, bundle)
         }
         binding.songsList.adapter = adapter
 

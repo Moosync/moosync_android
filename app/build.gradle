@@ -34,6 +34,7 @@ android {
     dataBinding {
         enabled true
     }
+    namespace 'app.moosync.moosync'
 }
 
 dependencies {
@@ -63,4 +64,7 @@ dependencies {
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
+
+    // Youtube player
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0'
 }

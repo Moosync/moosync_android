@@ -11,12 +11,12 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import app.moosync.moosync.R
+import app.moosync.moosync.utils.Constants.NOTIFICATION_CHANNEL_ID
+import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
 import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
 import app.moosync.moosync.utils.services.Actions.ACTION_REWIND
 import app.moosync.moosync.utils.services.Actions.ACTION_SKIP
 import app.moosync.moosync.utils.services.Actions.ACTION_TOGGLE_PAUSE
-import app.moosync.moosync.utils.services.Actions.NOTIFICATION_CHANNEL_ID
-import app.moosync.moosync.utils.services.Actions.NOTIFICATION_ID
 
 class MediaNotificationManager(
     private val mContext: Context,

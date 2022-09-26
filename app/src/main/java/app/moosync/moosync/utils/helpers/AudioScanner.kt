@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import android.util.Log
+import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Album
 import app.moosync.moosync.utils.models.Artist
 import app.moosync.moosync.utils.models.Genre
@@ -44,15 +45,18 @@ class AudioScanner {
 
                 if (isMusic != 0) {
                     try {
+                        val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                         songList.add(
                             Song(
-                                _id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)),
+                                _id = id,
                                 title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)),
                                 duration = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)),
                                 artist = getArtist(cursor),
                                 album = getAlbum(cursor),
                                 genre = getGenre(cursor),
-                                modified = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
+                                modified = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)),
+                                playbackUrl = id.toString(),
+                                type = PlayerTypes.LOCAL
                             )
                         )
                     } catch (e: FileNotFoundException) {

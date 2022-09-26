@@ -8,11 +8,11 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 import app.moosync.moosync.BuildConfig
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.models.Song
-import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
 import app.moosync.moosync.utils.services.Actions.ACTION_SHUFFLE
 import app.moosync.moosync.utils.services.Actions.PLAYBACK_STATE_ACTIONS
 
@@ -20,9 +20,10 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var notificationManager: MediaNotificationManager
-    private val playbackStateCompatBuilder: PlaybackStateCompat.Builder =
-        PlaybackStateCompat.Builder()
+    private val playbackStateCompatBuilder = PlaybackStateCompat.Builder()
     private val metadataManager = MetadataManager()
+
+    private lateinit var mediaPlayerCommunicator: MediaPlayerCommunicator
 
     override fun onCreate() {
         super.onCreate()
@@ -30,11 +31,8 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         mediaSession = createMediaSession()
         sessionToken = mediaSession.sessionToken
 
-        mediaSession.setCallback(
-            MediaPlayerCallback(
-                this, playbackStateChangeCallback
-            )
-        )
+        mediaPlayerCommunicator = MediaPlayerCommunicator(this, PlaybackStateHandler())
+        mediaSession.setCallback(mediaPlayerCommunicator)
 
         notificationManager = MediaNotificationManager(this, mediaSession.sessionToken)
     }
@@ -65,32 +63,6 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         return mediaSession
     }
 
-    private val playbackStateChangeCallback = object : PlaybackStateChangeCallback {
-        override fun onSongChange(song: Song) {
-            metadataManager.getMetadata(this@MediaPlayerService, song, metadataFetchCallback)
-
-            mediaSession.setPlaybackState(
-                playbackStateCompatBuilder
-                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1F)
-                    .setActions(PLAYBACK_STATE_ACTIONS)
-                    .addCustomAction(PlaybackStateCompat.CustomAction.Builder(ACTION_SHUFFLE, "Shuffle", R.drawable.ic_baseline_shuffle_48).build())
-                    .build()
-            )
-            notificationManager.updateMetadata()
-        }
-
-        override fun onPlaybackStateChange(isPlaying: Boolean, position: Int) {
-            mediaSession.setPlaybackState(
-                playbackStateCompatBuilder.setState(
-                    if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
-                    position.toLong(),
-                    1F
-                ).build()
-            )
-            notificationManager.updateMetadata()
-        }
-    }
-
     private val metadataFetchCallback = object : MetadataFetchCallback {
         override fun onCoverFetched(metadata: MediaMetadataCompat) {
             mediaSession.setMetadata(metadata)
@@ -99,6 +71,12 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         override fun onInitialMetadata(metadata: MediaMetadataCompat) {
             mediaSession.setMetadata(metadata)
         }
+    }
+
+    override fun onDestroy() {
+        Log.d("TAG", "onDestroy: destroying service")
+        mediaPlayerCommunicator.release()
+        super.onDestroy()
     }
 
     override fun onGetRoot(
@@ -114,5 +92,37 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
         result.sendResult(null)
+    }
+
+    inner class PlaybackStateHandler: MediaPlayerCommunicator.PlaybackStateChangeCallback {
+        override fun onSongChange(song: Song) {
+            metadataManager.getMetadata(this@MediaPlayerService, song, metadataFetchCallback)
+
+            mediaSession.setPlaybackState(
+                playbackStateCompatBuilder
+                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1F)
+                    .setActions(PLAYBACK_STATE_ACTIONS)
+                    .addCustomAction(
+                        PlaybackStateCompat.CustomAction.Builder(
+                            ACTION_SHUFFLE,
+                            "Shuffle",
+                            R.drawable.ic_baseline_shuffle_48
+                        ).build()
+                    )
+                    .build()
+            )
+            notificationManager.updateMetadata()
+        }
+
+        override fun onPlaybackStateChange(isPlaying: Boolean, position: Int) {
+            mediaSession.setPlaybackState(
+                playbackStateCompatBuilder.setState(
+                    if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
+                    position.toLong(),
+                    1F
+                ).build()
+            )
+            notificationManager.updateMetadata()
+        }
     }
 }

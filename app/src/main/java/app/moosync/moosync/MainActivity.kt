@@ -1,9 +1,7 @@
 package app.moosync.moosync
 
 import android.content.ComponentName
-import android.content.ContentUris
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -15,24 +13,30 @@ import app.moosync.moosync.utils.db.repository.SongRepository
 import app.moosync.moosync.utils.helpers.AudioScanner
 import app.moosync.moosync.utils.helpers.PermissionManager
 import app.moosync.moosync.utils.services.MediaPlayerService
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mMediaBrowser: MediaBrowserCompat
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val repo = SongRepository(this)
+        setContentView(R.layout.activity_main)
 
         PermissionManager(this).requestPermission {
-            val songs = AudioScanner().readDirectory(this)
-            repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())
+            // TODO: Decide which scope would be better
+            GlobalScope.launch(Dispatchers.IO) {
+                val songs = AudioScanner().readDirectory(this@MainActivity)
+                val repo = SongRepository(this@MainActivity)
+                repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())
 
-            Log.d("TAG", "onCreate: added songs")
+                Log.d("TAG", "onCreate: added songs")
+            }
         }
-
-        setContentView(R.layout.activity_main)
 
         mMediaBrowser = MediaBrowserCompat(
             this,
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity() {
             },
             null
         )
+
         mMediaBrowser.connect()
     }
 
@@ -80,6 +85,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    fun getMediaBrowser(): MediaBrowserCompat {
+        if (!mMediaBrowser.isConnected) {
+            mMediaBrowser.connect()
+        }
+
+        return mMediaBrowser
     }
 
     override fun onDestroy() {

@@ -1,10 +1,13 @@
 package app.moosync.moosync.utils.models
 
+import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.db.*
+import java.io.Serializable
 
-data class Artist(val id: Long, val name: String)
-data class Album(val id: Long, val name: String)
-data class Genre(val id: Long, val name: String)
+
+data class Artist(val id: Long, val name: String): Serializable
+data class Album(val id: Long, val name: String): Serializable
+data class Genre(val id: Long, val name: String): Serializable
 data class Song(
     val _id: Long,
     val title: String,
@@ -12,8 +15,10 @@ data class Song(
     val artist: List<Artist>?,
     val album: Album?,
     val genre: List<Genre>?,
-    val modified: Long
-) {
+    val modified: Long,
+    val playbackUrl: String?,
+    val type: PlayerTypes
+): Serializable {
 
     fun toDatabaseEntity(): RoomSongItem {
         return RoomSongItem(
@@ -22,7 +27,9 @@ data class Song(
                 title = title,
                 duration = duration,
                 albumId = album?.id,
-                dateModified = modified
+                dateModified = modified,
+                playbackUrl = playbackUrl,
+                type = type
             ),
             albums = album?.let { AlbumEntity(it.id, it.name) },
             artists = artist?.map {
@@ -45,12 +52,14 @@ data class Song(
                 title = item.song.title,
                 duration = item.song.duration,
                 modified = item.song.dateModified,
+                playbackUrl = item.song.playbackUrl,
+                type = item.song.type,
                 album = item.albums?.let { Album(it._id, it.name) },
                 artist = item.artists?.map { Artist(it._id, it.name) },
-                genre = item.genres?.map { Genre(it._id, it.name) }
+                genre = item.genres?.map { Genre(it._id, it.name) },
             )
         }
 
-        val emptySong = Song(-1, "", 0, null, null, null, 0)
+        val emptySong = Song(-1, "", 0, null, null, null, 0, null, PlayerTypes.LOCAL)
     }
 }

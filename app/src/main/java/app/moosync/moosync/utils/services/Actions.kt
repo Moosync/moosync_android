@@ -23,12 +23,4 @@ object Actions {
     or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
     or PlaybackStateCompat.ACTION_STOP
     or PlaybackStateCompat.ACTION_SEEK_TO)
-
-    const val NOTIFICATION_CHANNEL_ID = "now_playing_media"
-    const val NOTIFICATION_ID = 0xb339
-
-}
-
-object BundleConstants {
-    const val BUNDLE_SONG_ID_KEY = "songId"
 }

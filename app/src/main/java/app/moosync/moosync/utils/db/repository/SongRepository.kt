@@ -2,7 +2,6 @@ package app.moosync.moosync.utils.db.repository
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.Room
 import androidx.room.Transaction
 import app.moosync.moosync.utils.db.*
 

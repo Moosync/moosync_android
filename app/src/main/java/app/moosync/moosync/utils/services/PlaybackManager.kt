@@ -3,27 +3,40 @@ package app.moosync.moosync.utils.services
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
-import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
+import app.moosync.moosync.utils.PlayerTypes
+import app.moosync.moosync.utils.models.Song
+import app.moosync.moosync.utils.services.players.GenericPlayer
+import app.moosync.moosync.utils.services.players.LocalPlayer
+import app.moosync.moosync.utils.services.players.YoutubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
-class PlaybackManager private constructor() {
-    private val mediaPlayerInstance: MediaPlayer = MediaPlayer()
+class PlaybackManager private constructor(mContext: Context) {
+    private val players: HashMap<PlayerTypes, GenericPlayer> = hashMapOf(Pair(PlayerTypes.LOCAL, LocalPlayer()), Pair(PlayerTypes.YOUTUBE, YoutubePlayer(mContext)))
+
+    private var activePlayerType: PlayerTypes = PlayerTypes.LOCAL
+    private val activePlayer: GenericPlayer
+    get() = players[activePlayerType]!!
 
     var songProgress: Int
-    get() { return mediaPlayerInstance.currentPosition }
-    set(value) { mediaPlayerInstance.seekTo(value) }
+    get() { return activePlayer.progress }
+    set(value) { activePlayer.progress = value }
 
-    var isPlaying: Boolean
-        get() { return mediaPlayerInstance.isPlaying }
-        set(value) { if (value) mediaPlayerInstance.start() else mediaPlayerInstance.pause() }
+    val isPlaying: Boolean
+        get() { return activePlayer.isPlaying }
 
 
     companion object {
         private lateinit var INSTANCE: PlaybackManager
         private var isInitialized = false
 
-        operator fun invoke(): PlaybackManager {
+        operator fun invoke(mContext: Context): PlaybackManager {
             if (!isInitialized) {
-                INSTANCE = PlaybackManager()
+                INSTANCE = PlaybackManager(mContext)
                 isInitialized = true
             }
             return INSTANCE
@@ -31,21 +44,30 @@ class PlaybackManager private constructor() {
     }
 
     fun stop() {
-        mediaPlayerInstance.stop()
-        mediaPlayerInstance.reset()
+        activePlayer.stop()
     }
 
     fun release() {
-        mediaPlayerInstance.release()
+        activePlayer.release()
     }
 
-    fun playFromUri(mContext: Context, uri: Uri) {
-        mediaPlayerInstance.reset()
+    fun loadData(mContext: Context, data: Any) {
+        activePlayer.stop()
 
-        mediaPlayerInstance.setDataSource(mContext, uri)
-        mediaPlayerInstance.setOnPreparedListener {
-            mediaPlayerInstance.start()
+        if (data is Song) {
+            if (data.playbackUrl != null) {
+                activePlayerType = data.type
+                activePlayer.load(mContext, data.playbackUrl)
+            }
+        } else {
+            for (p in players) {
+                if (p.value.canPlayData(data)) {
+                    activePlayerType = p.key
+                    break
+                }
+            }
+
+            activePlayer.load(mContext, data)
         }
-        mediaPlayerInstance.prepareAsync()
     }
 }
