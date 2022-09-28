@@ -29,7 +29,7 @@ class LocalPlayer : GenericPlayer() {
         )
     }
 
-    override fun load(mContext: Context, data: Any) {
+    override fun load(mContext: Context, data: Any, autoPlay: Boolean) {
         playerInstance.reset()
 
         if (data is String) {
@@ -38,7 +38,7 @@ class LocalPlayer : GenericPlayer() {
             playerInstance.setDataSource(mContext, data)
         }
 
-        playerInstance.setOnPreparedListener { it.start() }
+        playerInstance.setOnPreparedListener { if (autoPlay) it.start() }
         playerInstance.prepareAsync()
     }
 
@@ -62,7 +62,6 @@ class LocalPlayer : GenericPlayer() {
 
     override fun stop() {
         playerInstance.stop()
-        playerInstance.reset()
     }
 
     override fun release() {

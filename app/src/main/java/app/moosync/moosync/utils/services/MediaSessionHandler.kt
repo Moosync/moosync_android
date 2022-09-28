@@ -82,24 +82,34 @@ class MediaSessionHandler(private val mContext: Context) {
     }
 
     fun updateMetadata(song: Song) {
-        val builder = MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist?.toArtistString() ?: "")
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.duration)
+        if (song != Song.emptySong) {
+            val builder = MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
+                .putString(
+                    MediaMetadataCompat.METADATA_KEY_ARTIST,
+                    song.artist?.toArtistString() ?: ""
+                )
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, song.duration)
 
-        mMediaSession.setMetadata(builder.build())
+            mMediaSession.setMetadata(builder.build())
 
-        GlideApp.with(mContext)
-            .asBitmap()
-            .load(AudioCover(song._id))
-            .signature(MediaStoreSignature("", song.modified, 0))
-            .into(object : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, resource)
-                    mMediaSession.setMetadata(builder.build())
-                }
+            GlideApp.with(mContext)
+                .asBitmap()
+                .load(AudioCover(song._id))
+                .signature(MediaStoreSignature("", song.modified, 0))
+                .into(object : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, resource)
+                        mMediaSession.setMetadata(builder.build())
+                    }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
+        } else {
+            mMediaSession.setMetadata(null)
+        }
     }
 }

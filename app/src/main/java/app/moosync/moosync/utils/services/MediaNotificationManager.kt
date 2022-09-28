@@ -7,13 +7,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.Constants.NOTIFICATION_CHANNEL_ID
 import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
-import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
 
 
 class MediaNotificationManager(
@@ -30,7 +30,6 @@ class MediaNotificationManager(
         // Cancel all notifications
         notificationManager.cancelAll()
         createNotificationChannel()
-        createNotification(mContext)
     }
 
     private fun createNotificationChannel() {
@@ -49,7 +48,7 @@ class MediaNotificationManager(
         }
     }
 
-    private fun createNotification(mContext: Context) {
+    private fun createNotification() {
         val mediaStyle = MediaStyle().setMediaSession(token).setShowActionsInCompactView(0, 1, 2)
 
         val clickIntent = PendingIntent
@@ -60,24 +59,26 @@ class MediaNotificationManager(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-        val intent = Intent(ACTION_QUIT)
-        val deleteIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
         notificationBuilder
             .setStyle(mediaStyle)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(clickIntent)
-            .setDeleteIntent(deleteIntent)
             .setShowWhen(false)
             .build()
 
         notification = notificationBuilder.build()
+    }
 
-        updateMetadata()
+    fun clearNotification() {
+        Log.d("TAG", "clearNotification: clearing")
+        notificationManager.cancel(NOTIFICATION_ID)
     }
 
     fun updateMetadata() {
+        if (notification == null) {
+            createNotification()
+        }
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 

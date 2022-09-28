@@ -4,7 +4,7 @@ import android.content.Context
 
 abstract class GenericPlayer {
     abstract fun canPlayData(data: Any): Boolean
-    abstract fun load(mContext: Context, data: Any)
+    abstract fun load(mContext: Context, data: Any, autoPlay: Boolean)
 
     abstract fun play()
     abstract fun pause()

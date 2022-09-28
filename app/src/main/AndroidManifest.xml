@@ -21,7 +21,8 @@
         <service
             android:name=".utils.services.MediaPlayerService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>

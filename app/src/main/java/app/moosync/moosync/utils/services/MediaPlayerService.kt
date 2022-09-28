@@ -1,18 +1,17 @@
 package app.moosync.moosync.utils.services
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.pm.ServiceInfo
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
 import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 import app.moosync.moosync.R
+import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
-import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
 import app.moosync.moosync.utils.services.interfaces.MediaControls
 import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
 
@@ -23,35 +22,67 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
     // Binder used to connect to activity
     private val binder: IBinder = MediaPlayerBinder()
 
+    private var isForegroundService = false
+    private var isMainActivityRunning = false
+
     override fun onCreate() {
         super.onCreate()
 
-        Log.d("TAG", "onCreate: creating service")
+        mediaController = MediaController(this, object : MediaController.ForegroundServiceCallbacks {
+            override fun shouldStartForeground() {
+                handleStartForeground()
+            }
 
-        mediaController = MediaController(this)
+            override fun shouldStopForeground() {
+                if (isMainActivityRunning) {
+                    handleStopForeground()
+                } else {
+                    quit()
+                }
+            }
+        })
         sessionToken = mediaController.sessionToken
-
-        registerReceiver(receiver, IntentFilter(ACTION_QUIT))
-        startForeground(NOTIFICATION_ID, mediaController.notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("TAG", "onStartCommand: $intent")
-        when (intent?.action) {
-            ACTION_QUIT -> quit()
+        val fromMainActivity = intent?.extras?.getBoolean(ACTION_FROM_MAIN_ACTIVITY) ?: false
+        if (fromMainActivity) {
+            isMainActivityRunning = true
         }
         return START_NOT_STICKY
     }
 
+    private fun handleStopForeground() {
+        if (isForegroundService) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            isForegroundService = false
+        }
+    }
+
+    private fun handleStartForeground() {
+        if (!isForegroundService) {
+            Log.d("TAG", "handleStartForeground: starting foreground")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    mediaController.notification!!,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, mediaController.notification)
+            }
+
+            isForegroundService = true
+        }
+    }
+
     private fun quit() {
-        stopForeground(STOP_FOREGROUND_REMOVE)
+        handleStopForeground()
         mediaController.release()
         stopSelf()
     }
 
     override fun onDestroy() {
-        Log.d("TAG", "onDestroy: destroying service")
-        unregisterReceiver(receiver)
         mediaController.release()
         super.onDestroy()
     }
@@ -91,12 +122,11 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
             override fun decideQuit() {
                 this@MediaPlayerService.decideQuit()
             }
-        }
-    }
 
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            quit()
+            override fun setMainActivityStatus(isRunning: Boolean) {
+                isMainActivityRunning = isRunning
+            }
+
         }
     }
 }

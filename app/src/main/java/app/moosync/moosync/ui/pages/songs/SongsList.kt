@@ -10,6 +10,8 @@ import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.SongItemAdapter
 import app.moosync.moosync.ui.base.BaseFragment
+import app.moosync.moosync.utils.PlayerTypes
+import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.viewModels.SongsViewModel
 
 class SongsList : BaseFragment() {
@@ -24,12 +26,19 @@ class SongsList : BaseFragment() {
         val viewModel: SongsViewModel by activityViewModels()
 
         val adapter = SongItemAdapter {
-            getMediaRemote()?.playSong(it)
+            if (it == Song.emptySong) {
+                getMediaRemote()?.stopPlayback()
+            } else {
+                getMediaRemote()?.playSong(it)
+            }
         }
         binding.songsList.adapter = adapter
 
         viewModel.getSongList().observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            val tmp = ArrayList(it)
+            tmp.add(0, Song.emptySong)
+            tmp.add(1, Song(69, "youtube", 90, null, null, null, 0, "gHzuabZUd6c", PlayerTypes.YOUTUBE))
+            adapter.submitList(tmp)
         }
 
         return binding.root

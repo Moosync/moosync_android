@@ -2,6 +2,7 @@ package app.moosync.moosync.utils.services.players
 
 import android.content.Context
 import android.util.Log
+import app.moosync.moosync.utils.PlaybackState
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
@@ -12,6 +13,10 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
     private val _playerView = YouTubePlayerView(mContext)
     private var playerInstance: YouTubePlayer? = null
     private var isInitialized = false
+
+    private var shouldPlayOnVideoLoad = false
+    private var isLoadingVideo = false
+    private val playerStateActionQueue = arrayListOf<PlaybackState>()
 
 
     init {
@@ -45,23 +50,43 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
         return isVideoId(data) != null
     }
 
-    override fun load(mContext: Context, data: Any) {
+    override fun load(mContext: Context, data: Any, autoPlay: Boolean) {
         val videoId = isVideoId(data)
         if (isInitialized && videoId != null) {
-            playerInstance!!.loadVideo(videoId, 0F)
+            playerInstance!!.cueVideo(videoId, 0F)
+            isLoadingVideo = true
+            shouldPlayOnVideoLoad = autoPlay
         }
     }
 
     override fun play() {
-        if (isInitialized) playerInstance!!.play()
+        if (isInitialized) {
+            if (isLoadingVideo) {
+                playerStateActionQueue.add(PlaybackState.PLAYING)
+            } else {
+                playerInstance!!.play()
+            }
+        }
     }
 
     override fun pause() {
-        if (isInitialized) playerInstance!!.pause()
+        if (isInitialized) {
+            if (isLoadingVideo) {
+                playerStateActionQueue.add(PlaybackState.PAUSED)
+            } else {
+                playerInstance!!.pause()
+            }
+        }
     }
 
     override fun stop() {
-        if (isInitialized) playerInstance!!.pause()
+        if (isInitialized) {
+            if (isLoadingVideo) {
+                playerStateActionQueue.add(PlaybackState.PAUSED)
+            } else {
+                playerInstance!!.pause()
+            }
+        }
     }
 
     override fun release() {
@@ -80,6 +105,25 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
         if (youtubePlayerListener != null) {
             playerInstance?.removeListener(youtubePlayerListener!!)
         }
+    }
+
+    private fun handleVideoLoad() {
+        val tmpList = playerStateActionQueue
+
+        if (shouldPlayOnVideoLoad) {
+            if (!(tmpList.contains(PlaybackState.PAUSED) || tmpList.contains(PlaybackState.STOPPED))) {
+                playerInstance!!.play()
+            }
+        }
+
+        for (action in tmpList) {
+            when(action) {
+                PlaybackState.PLAYING -> playerInstance!!.play()
+                PlaybackState.PAUSED, PlaybackState.STOPPED -> playerInstance!!.pause()
+            }
+        }
+
+        isLoadingVideo = false
     }
 
     inner class YoutubePlayerListener(private val playerListeners: PlayerListeners) :
@@ -118,13 +162,21 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
                 PlayerConstants.PlayerState.PLAYING -> true
                 PlayerConstants.PlayerState.PAUSED -> false
                 PlayerConstants.PlayerState.BUFFERING -> false
-                PlayerConstants.PlayerState.VIDEO_CUED -> false
+                PlayerConstants.PlayerState.VIDEO_CUED -> {
+                    handleVideoLoad()
+                    false
+                }
             }
+
+            Log.d("TAG", "onStateChange: $state")
         }
 
         override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {}
 
-        override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {}
+        override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
+            Log.d("TAG", "onVideoId: $videoId")
+            youTubePlayer.play()
+        }
 
         override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {}
     }

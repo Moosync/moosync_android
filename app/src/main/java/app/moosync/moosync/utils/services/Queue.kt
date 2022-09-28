@@ -3,7 +3,7 @@ package app.moosync.moosync.utils.services
 import app.moosync.moosync.utils.models.Song
 
 class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private val callbacks: QueueCallbacks) {
-    private var currentSongIndex: Int = 0
+    private var currentSongIndex: Int = -1
         set(value) {
             field = value
             callbacks.onCurrentSongChange(currentSong)

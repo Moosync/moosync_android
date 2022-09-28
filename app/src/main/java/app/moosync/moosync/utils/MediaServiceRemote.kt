@@ -3,7 +3,7 @@ package app.moosync.moosync.utils
 import android.app.Activity
 import android.content.*
 import android.os.IBinder
-import android.util.Log
+import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.MediaPlayerService
 import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
@@ -26,28 +26,38 @@ class MediaServiceRemote private constructor(activity: Activity) {
             }
         }
 
-        val contextWrapper = ContextWrapper(activity.applicationContext)
-        val intent = Intent(contextWrapper, MediaPlayerService::class.java)
+        bindService()
+    }
 
-        // Start service as foreground
-        contextWrapper.startForegroundService(intent)
+    private fun bindService() {
+        if (mediaService == null) {
+            val intent = Intent(mContextWrapper, MediaPlayerService::class.java)
+            intent.putExtra(ACTION_FROM_MAIN_ACTIVITY, true)
 
-        mContextWrapper.bindService(
-            Intent().setClass(
-                mContextWrapper,
-                MediaPlayerService::class.java
-            ), serviceConnection, Context.BIND_AUTO_CREATE
-        )
+            // Start service as foreground
+            mContextWrapper.startService(intent)
+
+            mContextWrapper.bindService(
+                Intent().setClass(
+                    mContextWrapper,
+                    MediaPlayerService::class.java
+                ), serviceConnection, Context.BIND_AUTO_CREATE
+            )
+        }
     }
 
     fun playSong(song: Song) {
         mediaService?.controls!!.playSong(song)
     }
 
+    fun stopPlayback() {
+        mediaService?.controls!!.stop()
+    }
+
     fun release() {
-        Log.d("TAG", "release: releasing")
         mediaService?.decideQuit()
         if (mediaService != null) {
+            mediaService?.setMainActivityStatus(false)
             mContextWrapper.unbindService(serviceConnection)
             mediaService = null
         }

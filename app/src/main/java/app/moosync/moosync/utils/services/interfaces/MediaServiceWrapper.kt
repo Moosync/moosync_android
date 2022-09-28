@@ -4,4 +4,6 @@ interface MediaServiceWrapper {
     val controls: MediaControls
 
     fun decideQuit()
+
+    fun setMainActivityStatus(isRunning: Boolean)
 }

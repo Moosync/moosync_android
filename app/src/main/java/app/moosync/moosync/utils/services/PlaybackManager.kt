@@ -46,13 +46,13 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
         activePlayer.setPlayerListeners(playerListeners)
     }
 
-    fun loadData(mContext: Context, data: Any) {
+    fun loadData(mContext: Context, data: Any, autoPlay: Boolean) {
         activePlayer.stop()
 
         if (data is Song) {
             if (data.playbackUrl != null) {
                 switchActivePlayer(data.type)
-                activePlayer.load(mContext, data.playbackUrl)
+                activePlayer.load(mContext, data.playbackUrl, autoPlay)
             }
         } else {
             for (p in players) {
@@ -62,7 +62,7 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
                 }
             }
 
-            activePlayer.load(mContext, data)
+            activePlayer.load(mContext, data, autoPlay)
         }
     }
 }

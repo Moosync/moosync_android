@@ -5,7 +5,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 object Actions {
     const val MOOSYNC_PACKAGE_NAME = "app.moosync.moosync"
 
-    const val ACTION_QUIT = "$MOOSYNC_PACKAGE_NAME.quitservice"
     const val ACTION_SHUFFLE = "$MOOSYNC_PACKAGE_NAME.shuffle"
 
     const val PLAYBACK_STATE_ACTIONS = (PlaybackStateCompat.ACTION_PLAY
