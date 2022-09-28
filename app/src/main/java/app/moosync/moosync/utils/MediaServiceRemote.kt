@@ -6,22 +6,23 @@ import android.os.IBinder
 import android.util.Log
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.MediaPlayerService
+import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
 
 class MediaServiceRemote private constructor(activity: Activity) {
 
-    private var mediaPlayerService: MediaPlayerService? = null
+    private var mediaService: MediaServiceWrapper? = null
     private val mContextWrapper: ContextWrapper = ContextWrapper(activity)
     private val serviceConnection: ServiceConnection
 
     init {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                val binder = p1 as MediaPlayerService.MusicBinder?
-                mediaPlayerService = binder?.service
+                val binder = p1 as MediaPlayerService.MediaPlayerBinder?
+                mediaService = binder?.service
             }
 
             override fun onServiceDisconnected(p0: ComponentName?) {
-                mediaPlayerService = null
+                mediaService = null
             }
         }
 
@@ -40,15 +41,15 @@ class MediaServiceRemote private constructor(activity: Activity) {
     }
 
     fun playSong(song: Song) {
-        mediaPlayerService?.mediaQueueManager?.playSong(song)
+        mediaService?.controls!!.playSong(song)
     }
 
     fun release() {
         Log.d("TAG", "release: releasing")
-        mediaPlayerService?.decideQuit()
-        if (mediaPlayerService != null) {
+        mediaService?.decideQuit()
+        if (mediaService != null) {
             mContextWrapper.unbindService(serviceConnection)
-            mediaPlayerService = null
+            mediaService = null
         }
     }
 

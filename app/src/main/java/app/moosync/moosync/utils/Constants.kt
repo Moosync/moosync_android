@@ -9,3 +9,9 @@ enum class PlayerTypes {
     LOCAL,
     YOUTUBE
 }
+
+enum class PlaybackStates {
+    PLAYING,
+    PAUSED,
+    STOPPED
+}

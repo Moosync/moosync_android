@@ -31,7 +31,7 @@ class MediaSessionHandler(private val mContext: Context) {
         mMediaSession = createMediaSession(mContext)
     }
 
-    fun setCommunicatorCallback(callback: MediaPlayerCommunicator) {
+    fun setCommunicatorCallback(callback: MediaSessionCompat.Callback) {
         mMediaSession.setCallback(callback)
     }
 

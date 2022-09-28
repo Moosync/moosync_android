@@ -13,24 +13,26 @@ import androidx.media.MediaBrowserServiceCompat
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
 import app.moosync.moosync.utils.services.Actions.ACTION_QUIT
+import app.moosync.moosync.utils.services.interfaces.MediaControls
+import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
 
 class MediaPlayerService : MediaBrowserServiceCompat() {
     // Manages everything related to music playback
-    lateinit var mediaQueueManager: MediaQueueManager
+    private lateinit var mediaController: MediaController
 
     // Binder used to connect to activity
-    private val binder: IBinder = MusicBinder()
+    private val binder: IBinder = MediaPlayerBinder()
 
     override fun onCreate() {
         super.onCreate()
 
         Log.d("TAG", "onCreate: creating service")
 
-        mediaQueueManager = MediaQueueManager(this)
-        sessionToken = mediaQueueManager.sessionToken
+        mediaController = MediaController(this)
+        sessionToken = mediaController.sessionToken
 
         registerReceiver(receiver, IntentFilter(ACTION_QUIT))
-        startForeground(NOTIFICATION_ID, mediaQueueManager.notification)
+        startForeground(NOTIFICATION_ID, mediaController.notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -43,14 +45,14 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
 
     private fun quit() {
         stopForeground(STOP_FOREGROUND_REMOVE)
-        mediaQueueManager.release()
+        mediaController.release()
         stopSelf()
     }
 
     override fun onDestroy() {
         Log.d("TAG", "onDestroy: destroying service")
         unregisterReceiver(receiver)
-        mediaQueueManager.release()
+        mediaController.release()
         super.onDestroy()
     }
 
@@ -76,14 +78,20 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
     }
 
     fun decideQuit() {
-        if(mediaQueueManager.decideQuit()) {
+        if(mediaController.decideQuit()) {
             quit()
         }
     }
 
-    inner class MusicBinder : Binder() {
-        val service: MediaPlayerService
-            get() = this@MediaPlayerService
+    inner class MediaPlayerBinder : Binder() {
+        val service = object: MediaServiceWrapper {
+            override val controls: MediaControls
+                get() = this@MediaPlayerService.mediaController.controls
+
+            override fun decideQuit() {
+                this@MediaPlayerService.decideQuit()
+            }
+        }
     }
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
