@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
-    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    <app.moosync.moosync.ui.views.ThemedLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -31,17 +33,18 @@
             android:orientation="vertical"
             android:padding="5dp">
 
-            <TextView
+            <app.moosync.moosync.ui.views.ThemedTextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="@tools:sample/lorem[3]" />
 
-            <TextView
+            <app.moosync.moosync.ui.views.ThemedTextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="@tools:sample/lorem[4]" />
+                tools:text="@tools:sample/lorem[4]"
+                app:themeStyle="textSecondary"/>
         </LinearLayout>
-    </LinearLayout>
+    </app.moosync.moosync.ui.views.ThemedLinearLayout>
 </layout>
