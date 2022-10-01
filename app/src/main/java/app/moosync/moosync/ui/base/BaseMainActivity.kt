@@ -1,10 +1,9 @@
 package app.moosync.moosync.ui.base
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import app.moosync.moosync.utils.MediaServiceRemote
 
-abstract class BaseMainActivity : AppCompatActivity() {
+abstract class BaseMainActivity : BaseActivity() {
     private var mediaServiceRemote: MediaServiceRemote? = null
 
     fun getMediaRemote(): MediaServiceRemote? {

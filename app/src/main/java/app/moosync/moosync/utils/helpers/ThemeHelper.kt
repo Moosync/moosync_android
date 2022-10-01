@@ -1,11 +1,11 @@
 package app.moosync.moosync.utils.helpers
 
 import android.content.res.TypedArray
-import android.util.Log
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+
 
 enum class ColorStyles(val value: Int) {
     ACCENT(0),
@@ -33,7 +33,6 @@ object ThemeHelper {
     private val divider = MutableLiveData((0xFFA0A0A0).toInt())
 
     fun parseStyleFromName(name: ColorStyles): MutableLiveData<Int> {
-        Log.d("TAG", "parseStyleFromName: $name")
         return when(name) {
             ColorStyles.PRIMARY -> primary
             ColorStyles.ACCENT-> accent
@@ -45,6 +44,30 @@ object ThemeHelper {
             ColorStyles.DIVIDER -> divider
         }
     }
+
+//    init {
+//        val h = android.os.Handler(Looper.getMainLooper())
+//        Timer().scheduleAtFixedRate(object: TimerTask() {
+//            override fun run() {
+//                h.post {
+//                    primary.value = getRandomColor()
+//                    secondary.value = getRandomColor()
+//                    tertiary.value = getRandomColor()
+//                    textPrimary.value = getRandomColor()
+//                    textSecondary.value = getRandomColor()
+//                    accent.value = getRandomColor()
+//                }
+//            }
+//        }, 0, 1000)
+//    }
+//
+//    private fun getRandomColor(): Int {
+//        val rand = Random()
+//        val r = rand.nextFloat()
+//        val g = rand.nextFloat()
+//        val b = rand.nextFloat()
+//        return Color.rgb(r, g, b)
+//    }
 }
 
 fun TypedArray.getColorStyle(styleable: Int, defValue: ColorStyles): ColorStyles {
