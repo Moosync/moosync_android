@@ -1,5 +1,12 @@
 <resources>
-    <string name="app_name">Moosync-kotlin</string>
+    <string name="app_name">Moosync</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="queue">Queue</string>
+    <string name="all_songs">All Songs</string>
+    <string name="playlists">Playlists</string>
+    <string name="albums">Albums</string>
+    <string name="artists">Artists</string>
+    <string name="genre">Genre</string>
+    <string name="explore">Explore</string>
 </resources>
