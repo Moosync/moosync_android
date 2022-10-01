@@ -22,4 +22,8 @@
     <declare-styleable name="ThemedFrameLayout">
         <attr name="themeStyle"/>
     </declare-styleable>
+
+    <declare-styleable name="ThemedNavigationView">
+        <attr name="themeStyle"/>
+    </declare-styleable>
 </resources>
