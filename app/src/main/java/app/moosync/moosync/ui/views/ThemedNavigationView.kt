@@ -8,25 +8,21 @@ import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import app.moosync.moosync.R
-import app.moosync.moosync.utils.helpers.*
+import app.moosync.moosync.utils.helpers.ColorStyles
+import app.moosync.moosync.utils.helpers.getColor
+import app.moosync.moosync.utils.helpers.getTransparent
+import app.moosync.moosync.utils.helpers.observe
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
 class ThemedNavigationView(context: Context, attrs: AttributeSet?): NavigationView(context, attrs) {
-    private val colorStyle: ColorStyles
 
-    init {
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.ThemedNavigationView)
-        colorStyle = attributes.getColorStyle(R.styleable.ThemedNavigationView_themeStyle, ColorStyles.PRIMARY)
-        setCustomColor(colorStyle)
-        attributes.recycle()
-    }
+    private val dependOnColors:Array<ColorStyles> = arrayOf(ColorStyles.PRIMARY, ColorStyles.TEXT_PRIMARY, ColorStyles.ACCENT, ColorStyles.TEXT_SECONDARY)
 
-    private fun setCustomColor(colorStyle: ColorStyles) {
-        setBackgroundColor(colorStyle.getColor())
+    private fun setCustomColor() {
+        setBackgroundColor(ColorStyles.PRIMARY.getColor())
 
         val states = arrayOf(
             arrayOf(android.R.attr.state_checked).toIntArray(),
@@ -80,8 +76,10 @@ class ThemedNavigationView(context: Context, attrs: AttributeSet?): NavigationVi
     override fun onAttachedToWindow() {
         val lifecycleOwner = findViewTreeLifecycleOwner()
         if (lifecycleOwner != null) {
-            colorStyle.observe(lifecycleOwner) {
-                setCustomColor(it)
+            dependOnColors.forEach {
+                it.observe(lifecycleOwner) {
+                    setCustomColor()
+                }
             }
         }
 
