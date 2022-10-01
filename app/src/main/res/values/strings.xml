@@ -9,4 +9,7 @@
     <string name="artists">Artists</string>
     <string name="genre">Genre</string>
     <string name="explore">Explore</string>
+
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
 </resources>

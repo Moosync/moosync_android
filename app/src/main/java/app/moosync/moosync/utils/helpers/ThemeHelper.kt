@@ -2,7 +2,10 @@ package app.moosync.moosync.utils.helpers
 
 import android.content.res.TypedArray
 import android.util.Log
+import androidx.core.graphics.ColorUtils
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 
 enum class ColorStyles(val value: Int) {
     ACCENT(0),
@@ -20,14 +23,14 @@ enum class ColorStyles(val value: Int) {
 }
 
 object ThemeHelper {
-    val accent = MutableLiveData((0xFF65CB88).toInt())
-    val primary = MutableLiveData((0xFF212121).toInt())
-    val secondary = MutableLiveData((0xFF282828).toInt())
-    val tertiary = MutableLiveData((0xFF151515).toInt())
-    val textPrimary = MutableLiveData((0xFFFFFFFF).toInt())
-    val textSecondary = MutableLiveData((0xFF565656).toInt())
-    val textInverse = MutableLiveData((0xFF000000).toInt())
-    val divider = MutableLiveData((0xFFA0A0A0).toInt())
+    private val accent = MutableLiveData((0xFF65CB88).toInt())
+    private val primary = MutableLiveData((0xFF212121).toInt())
+    private val secondary = MutableLiveData((0xFF282828).toInt())
+    private val tertiary = MutableLiveData((0xFF151515).toInt())
+    private val textPrimary = MutableLiveData((0xFFFFFFFF).toInt())
+    private val textSecondary = MutableLiveData((0xFF565656).toInt())
+    private val textInverse = MutableLiveData((0xFF000000).toInt())
+    private val divider = MutableLiveData((0xFFA0A0A0).toInt())
 
     fun parseStyleFromName(name: ColorStyles): MutableLiveData<Int> {
         Log.d("TAG", "parseStyleFromName: $name")
@@ -44,7 +47,20 @@ object ThemeHelper {
     }
 }
 
-fun TypedArray.getColorStyle(styleable: Int, defValue: ColorStyles): MutableLiveData<Int> {
-    val style = ColorStyles.fromInt(getInt(styleable, defValue.value))
-    return ThemeHelper.parseStyleFromName(style)
+fun TypedArray.getColorStyle(styleable: Int, defValue: ColorStyles): ColorStyles {
+    return ColorStyles.fromInt(getInt(styleable, defValue.value))
+}
+
+fun ColorStyles.getColor(): Int {
+    return ThemeHelper.parseStyleFromName(this).value!!
+}
+
+fun ColorStyles.observe(lifecycle: LifecycleOwner, observer: Observer<ColorStyles>) {
+    ThemeHelper.parseStyleFromName(this).observe(lifecycle) {
+        observer.onChanged(this)
+    }
+}
+
+fun ColorStyles.getTransparent(alpha: Int): Int {
+    return ColorUtils.setAlphaComponent(this.getColor(), alpha)
 }
