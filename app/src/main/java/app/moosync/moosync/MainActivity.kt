@@ -25,8 +25,8 @@ class MainActivity : BaseMainActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        setToolbar()
-        setNavigationDrawer()
+//        setToolbar()
+//        setNavigationDrawer()
 
         PermissionManager(this).requestPermission {
             // TODO: Decide which scope would be better
@@ -40,19 +40,19 @@ class MainActivity : BaseMainActivity() {
         }
     }
 
-    private fun setToolbar() {
-        setSupportActionBar(binding.appBarMain.toolbar)
-
-        with(supportActionBar!!) {
-            setDisplayHomeAsUpEnabled(true)
-        }
-    }
-
-    private fun setNavigationDrawer() {
-        actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.nav_open, R.string.nav_close)
-        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle)
-        actionBarDrawerToggle.syncState()
-    }
+//    private fun setToolbar() {
+//        setSupportActionBar(binding.appBarMain.toolbar)
+//
+//        with(supportActionBar!!) {
+//            setDisplayHomeAsUpEnabled(true)
+//        }
+//    }
+//
+//    private fun setNavigationDrawer() {
+//        actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.nav_open, R.string.nav_close)
+//        binding.drawerLayout.addDrawerListener(actionBarDrawerToggle)
+//        actionBarDrawerToggle.syncState()
+//    }
 
     override fun onDestroy() {
         Log.d("TAG", "onDestroy: Destroying main activity")

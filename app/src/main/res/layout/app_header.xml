@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<app.moosync.moosync.ui.views.ThemedLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_app_icon" />
+
+    <app.moosync.moosync.ui.views.ThemedTextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="@string/app_name" />
+</app.moosync.moosync.ui.views.ThemedLinearLayout>

@@ -9,29 +9,27 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <com.google.android.material.appbar.AppBarLayout
+        <app.moosync.moosync.ui.views.ThemedLinearLayout
+            android:id="@+id/songsListHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent">
 
-            <app.moosync.moosync.ui.views.ThemedToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+            <include layout="@layout/app_header" />
+            <include layout="@layout/songs_list_header" />
+        </app.moosync.moosync.ui.views.ThemedLinearLayout>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:defaultNavHost="true"
+            app:layout_constraintTop_toBottomOf="@+id/songsListHeader"
             app:navGraph="@navigation/nav_graph" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

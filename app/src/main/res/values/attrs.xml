@@ -30,4 +30,8 @@
     <declare-styleable name="ThemedToolbar">
         <attr name="themeStyle"/>
     </declare-styleable>
+
+    <declare-styleable name="ThemedBottomNavigationView">
+        <attr name="themeStyle" />
+    </declare-styleable>
 </resources>
