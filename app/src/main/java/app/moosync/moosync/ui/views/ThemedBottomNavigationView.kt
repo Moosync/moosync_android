@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import app.moosync.moosync.utils.helpers.ColorStyles
-import app.moosync.moosync.utils.helpers.getColor
-import app.moosync.moosync.utils.helpers.getTransparent
-import app.moosync.moosync.utils.helpers.observe
+import app.moosync.moosync.utils.helpers.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ThemedBottomNavigationView(context: Context, attrs: AttributeSet?) : BottomNavigationView(context, attrs) {
@@ -30,8 +27,7 @@ class ThemedBottomNavigationView(context: Context, attrs: AttributeSet?) : Botto
             ColorStyles.ACCENT.getColor(),
         ).toIntArray()
 
-        val colorStateList = ColorStateList(states, stateColors)
-        itemTextColor = colorStateList
+        itemTextColor = ColorStateList(states, stateColors)
 
         val itemBackgroundStates = arrayOf(
             arrayOf(android.R.attr.state_enabled).toIntArray(),
@@ -41,6 +37,17 @@ class ThemedBottomNavigationView(context: Context, attrs: AttributeSet?) : Botto
         ).toIntArray()
 
         itemActiveIndicatorColor = ColorStateList(itemBackgroundStates, itemBackgroundStateColors)
+
+        val itemTintStates = arrayOf(
+            arrayOf(android.R.attr.state_checked).toIntArray(),
+            arrayOf(android.R.attr.state_enabled).toIntArray(),
+        )
+        val itemTintColors = arrayOf(
+            ColorStyles.ACCENT.getLighterShade(),
+            ColorStyles.TEXT_PRIMARY.getColor()
+        ).toIntArray()
+
+        itemIconTintList = ColorStateList(itemTintStates, itemTintColors)
     }
 
 //    private fun getDrawable(): Drawable {

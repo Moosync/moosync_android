@@ -87,3 +87,10 @@ fun ColorStyles.observe(lifecycle: LifecycleOwner, observer: Observer<ColorStyle
 fun ColorStyles.getTransparent(alpha: Int): Int {
     return ColorUtils.setAlphaComponent(this.getColor(), alpha)
 }
+
+fun ColorStyles.getLighterShade(): Int {
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL(this.getColor(), hsl)
+    hsl[2] += hsl[2] * 50/100
+    return ColorUtils.HSLToColor(hsl)
+}
