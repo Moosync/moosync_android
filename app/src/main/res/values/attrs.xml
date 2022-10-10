@@ -23,7 +23,7 @@
         <attr name="themeStyle"/>
     </declare-styleable>
 
-    <declare-styleable name="ThemedNavigationView">
+    <declare-styleable name="ThemedCardLayout">
         <attr name="themeStyle"/>
     </declare-styleable>
 
@@ -33,5 +33,9 @@
 
     <declare-styleable name="ThemedBottomNavigationView">
         <attr name="themeStyle" />
+    </declare-styleable>
+
+    <declare-styleable name="ThemedProgressBar">
+        <attr name="themeStyle"/>
     </declare-styleable>
 </resources>
