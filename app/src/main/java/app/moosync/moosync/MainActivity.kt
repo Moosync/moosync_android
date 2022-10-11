@@ -3,9 +3,15 @@ package app.moosync.moosync
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.MotionEvent.*
 import android.view.View
+import android.view.View.OnTouchListener
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.animation.doOnEnd
 import androidx.databinding.DataBindingUtil
 import app.moosync.moosync.databinding.ActivityMainBinding
 import app.moosync.moosync.glide.AudioCover
@@ -25,6 +31,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class MainActivity : BaseMainActivity() {
 
@@ -58,9 +65,7 @@ class MainActivity : BaseMainActivity() {
 
         val behaviour = BottomSheetBehavior.from(binding.bottomSheet.standardBottomSheet)
         behaviour.addBottomSheetCallback(object : BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                Log.d("TAG", "onStateChanged: $newState")
-            }
+            override fun onStateChanged(bottomSheet: View, newState: Int) {}
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 binding.themedBottomNavigationView.alpha = 1 - slideOffset
@@ -72,6 +77,131 @@ class MainActivity : BaseMainActivity() {
         })
 
         setMediaPlayerCallbacks()
+        setupMiniPlayerSlideGestures {
+            getMediaRemote()?.stopPlayback()
+        }
+    }
+
+    private fun setupMiniPlayerSlideGestures(onEndCallback: () -> Unit) {
+        binding.bottomSheet.miniPlayer.miniPlayerContainer.setOnTouchListener(object: OnTouchListener {
+
+            private var touchCoordinateX: Float = 0f
+            private var touchCoordinateY: Float = 0f
+
+            private val SWIPE_VELOCITY_THRESHOLD_X = 1000
+            private val SWIPE_VELOCITY_THRESHOLD_Y = 400
+
+
+            private var isDismissing = false
+
+            var width: Float? = null
+
+            private fun getWidth(): Float {
+                if (width == null) {
+                    width = binding.bottomSheet.miniPlayer.miniPlayerContainer.width.toFloat()
+                }
+
+                return width!!
+            }
+
+            val gestureDetector = GestureDetector(this@MainActivity, object : SimpleOnGestureListener() {
+                override fun onFling(
+                    e1: MotionEvent,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    Log.d("TAG", "onFling: $velocityY $velocityX")
+                    if (abs(velocityX) > SWIPE_VELOCITY_THRESHOLD_X || abs(velocityY) > SWIPE_VELOCITY_THRESHOLD_Y) {
+                        if (abs(velocityX) > abs(velocityY)) {
+                            if (velocityX > 0) dismiss(true) else dismiss(false)
+                        } else if (velocityY > 0) {
+                            dismissDown()
+                        }
+                        return true
+
+                    }
+                    return false
+                }
+            })
+
+            private fun dismiss(left: Boolean = false) {
+                isDismissing = true
+
+                val translateX = getWidth() + 30
+
+                ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationX", if (left) -translateX else translateX).apply {
+                    duration = 100
+                    doOnEnd {
+                        setBottomSheetPeek(peek = false, animate = false)
+                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX = 0f
+                        onEndCallback.invoke()
+                        isDismissing = false
+                    }
+                    start()
+                }
+            }
+
+            private fun dismissDown() {
+                isDismissing = true
+
+                val translateY = binding.bottomSheet.miniPlayer.miniPlayerContainer.height.toFloat() + 30
+
+                ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationY", translateY).apply {
+                    duration = 100
+                    doOnEnd {
+                        setBottomSheetPeek(peek = false, animate = false)
+                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationY = 0f
+                        onEndCallback.invoke()
+                        isDismissing = false
+                    }
+                    start()
+                }
+            }
+
+            private fun animateToOriginalPos() {
+                ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationX", 0f).apply {
+                    duration = 100
+                    start()
+                }
+            }
+
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                if (p1 != null) {
+
+                    gestureDetector.onTouchEvent(p1)
+
+                    if (p1.action == ACTION_MOVE) {
+                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX += p1.x - touchCoordinateX
+                    }
+
+                    if (p1.action == ACTION_DOWN) {
+                        touchCoordinateX = p1.x
+                    }
+
+                    if (p1.action == ACTION_CANCEL) {
+                        animateToOriginalPos()
+                    }
+
+                    if (p1.action == ACTION_UP) {
+                        if (p1.x == touchCoordinateX && p1.y == touchCoordinateY) {
+                            p0?.performClick()
+                        }
+
+                        val movement = binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX
+
+                        if (abs(movement) > getWidth() / 2) {
+                            dismiss(movement <= 0)
+                            return true
+                        }
+
+                        animateToOriginalPos()
+                    }
+                }
+
+                return true
+            }
+        })
     }
 
     private fun setMediaPlayerCallbacks() {
