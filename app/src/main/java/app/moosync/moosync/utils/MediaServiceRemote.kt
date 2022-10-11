@@ -6,6 +6,7 @@ import android.os.IBinder
 import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.MediaPlayerService
+import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
 
 class MediaServiceRemote private constructor(activity: Activity) {
@@ -14,11 +15,14 @@ class MediaServiceRemote private constructor(activity: Activity) {
     private val mContextWrapper: ContextWrapper = ContextWrapper(activity)
     private val serviceConnection: ServiceConnection
 
+    private val methodQueue: MutableList<() -> Unit> = mutableListOf()
+
     init {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 val binder = p1 as MediaPlayerService.MediaPlayerBinder?
                 mediaService = binder?.service
+                runFromMethodQueue()
             }
 
             override fun onServiceDisconnected(p0: ComponentName?) {
@@ -27,6 +31,23 @@ class MediaServiceRemote private constructor(activity: Activity) {
         }
 
         bindService()
+    }
+
+    private fun runFromMethodQueue() {
+        for (method in methodQueue) {
+            method.invoke()
+        }
+    }
+
+    private fun runOrAddToQueue(method: () -> Unit) {
+        if (mediaService == null) {
+            methodQueue.add {
+                method.invoke()
+            }
+            return
+        }
+
+        method.invoke()
     }
 
     private fun bindService() {
@@ -47,11 +68,21 @@ class MediaServiceRemote private constructor(activity: Activity) {
     }
 
     fun playSong(song: Song) {
-        mediaService?.controls!!.playSong(song)
+        runOrAddToQueue {
+            mediaService!!.controls.playSong(song)
+        }
+    }
+
+    fun addMediaCallbacks(callbacks: MediaPlayerCallbacks) {
+        runOrAddToQueue {
+            mediaService!!.addMediaPlayerCallbacks(callbacks)
+        }
     }
 
     fun stopPlayback() {
-        mediaService?.controls!!.stop()
+        runOrAddToQueue {
+            mediaService!!.controls.stop()
+        }
     }
 
     fun release() {

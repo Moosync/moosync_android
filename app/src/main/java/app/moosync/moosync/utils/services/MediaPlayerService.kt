@@ -13,6 +13,7 @@ import app.moosync.moosync.R
 import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
 import app.moosync.moosync.utils.services.interfaces.MediaControls
+import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import app.moosync.moosync.utils.services.interfaces.MediaServiceWrapper
 
 class MediaPlayerService : MediaBrowserServiceCompat() {
@@ -127,6 +128,9 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
                 isMainActivityRunning = isRunning
             }
 
+            override fun addMediaPlayerCallbacks(callbacks: MediaPlayerCallbacks) {
+                this@MediaPlayerService.mediaController.addPlayerCallbacks(callbacks)
+            }
         }
     }
 }

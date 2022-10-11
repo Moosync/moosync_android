@@ -3,9 +3,11 @@ package app.moosync.moosync.utils.services
 import android.app.Notification
 import android.content.Context
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import app.moosync.moosync.utils.PlaybackState
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaControls
+import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import app.moosync.moosync.utils.services.players.PlayerListeners
 
 
@@ -31,10 +33,13 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
     private var playerState: PlaybackState = PlaybackState.STOPPED
 
-
     private val playbackManager: PlaybackManager
 
+    private val mediaPlayerCallbacks: MutableList<MediaPlayerCallbacks> = mutableListOf()
+
     private fun handleSongChange(song: Song) {
+        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, listOf(song))
+
         mediaSessionHandler.updateMetadata(song)
         mediaSessionHandler.updatePlayerState(true)
         notificationManager.updateMetadata()
@@ -63,9 +68,18 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
         if (oldState != newState) {
             when (newState) {
-                PlaybackState.PLAYING -> playbackManager.play()
-                PlaybackState.PAUSED -> playbackManager.pause()
-                PlaybackState.STOPPED -> playbackManager.stop()
+                PlaybackState.PLAYING -> {
+                    playbackManager.play()
+                    emitCallbackMethod(CallbackMethods.ON_PLAY)
+                }
+                PlaybackState.PAUSED -> {
+                    playbackManager.pause()
+                    emitCallbackMethod(CallbackMethods.ON_PAUSE)
+                }
+                PlaybackState.STOPPED -> {
+                    playbackManager.stop()
+                    emitCallbackMethod(CallbackMethods.ON_STOP)
+                }
             }
             playerState = newState
             handlePlaybackStateChange(oldState, newState)
@@ -79,6 +93,23 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
     fun decideQuit(): Boolean {
         return !playbackManager.isPlaying
+    }
+
+    fun addPlayerCallbacks(callbacks: MediaPlayerCallbacks) {
+        Log.d("TAG", "addPlayerCallbacks: registering callback")
+        mediaPlayerCallbacks.add(callbacks)
+    }
+
+    private fun emitCallbackMethod(method: CallbackMethods, args: List<Any?> = listOf()) {
+        for (callback in this.mediaPlayerCallbacks) {
+            Log.d("TAG", "emitCallbackMethod: emitting callback method")
+            when (method) {
+                CallbackMethods.ON_PLAY -> callback.onPlay()
+                CallbackMethods.ON_PAUSE -> callback.onPause()
+                CallbackMethods.ON_STOP -> callback.onStop()
+                CallbackMethods.ON_SONG_CHANGE -> callback.onSongChange(args[0] as Song)
+            }
+        }
     }
 
     init {
@@ -166,5 +197,9 @@ class MediaController(private val mContext: Context, private val foregroundServi
     interface ForegroundServiceCallbacks {
         fun shouldStartForeground()
         fun shouldStopForeground()
+    }
+
+    private enum class CallbackMethods {
+        ON_PLAY, ON_PAUSE, ON_STOP, ON_SONG_CHANGE
     }
 }

@@ -6,4 +6,6 @@ interface MediaServiceWrapper {
     fun decideQuit()
 
     fun setMainActivityStatus(isRunning: Boolean)
+
+    fun addMediaPlayerCallbacks(callbacks: MediaPlayerCallbacks)
 }
