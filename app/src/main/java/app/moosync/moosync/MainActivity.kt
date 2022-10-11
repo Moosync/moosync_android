@@ -22,7 +22,6 @@ import app.moosync.moosync.utils.helpers.AudioScanner
 import app.moosync.moosync.utils.helpers.PermissionManager
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -88,21 +87,12 @@ class MainActivity : BaseMainActivity() {
             private var touchCoordinateX: Float = 0f
             private var touchCoordinateY: Float = 0f
 
-            private val SWIPE_VELOCITY_THRESHOLD_X = 1000
-            private val SWIPE_VELOCITY_THRESHOLD_Y = 400
-
+            private val SWIPE_VELOCITY_THRESHOLD_Y = 2000
 
             private var isDismissing = false
 
-            var width: Float? = null
-
-            private fun getWidth(): Float {
-                if (width == null) {
-                    width = binding.bottomSheet.miniPlayer.miniPlayerContainer.width.toFloat()
-                }
-
-                return width!!
-            }
+            val width: Float
+            get() = binding.bottomSheet.miniPlayer.miniPlayerContainer.width.toFloat()
 
             val gestureDetector = GestureDetector(this@MainActivity, object : SimpleOnGestureListener() {
                 override fun onFling(
@@ -111,32 +101,30 @@ class MainActivity : BaseMainActivity() {
                     velocityX: Float,
                     velocityY: Float
                 ): Boolean {
-                    Log.d("TAG", "onFling: $velocityY $velocityX")
-                    if (abs(velocityX) > SWIPE_VELOCITY_THRESHOLD_X || abs(velocityY) > SWIPE_VELOCITY_THRESHOLD_Y) {
-                        if (abs(velocityX) > abs(velocityY)) {
-                            if (velocityX > 0) dismiss(true) else dismiss(false)
-                        } else if (velocityY > 0) {
-                            dismissDown()
-                        }
+                    if (abs(velocityY) > SWIPE_VELOCITY_THRESHOLD_Y) {
+                        dismissDown()
                         return true
-
                     }
                     return false
                 }
             })
 
+            private fun onAnimationEnd() {
+                setBottomSheetPeek(peek = false, animate = false)
+                binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX = 0f
+                binding.bottomSheet.miniPlayer.miniPlayerContainer.translationY = 0f
+                onEndCallback.invoke()
+                isDismissing = false
+            }
+
             private fun dismiss(left: Boolean = false) {
                 isDismissing = true
 
-                val translateX = getWidth() + 30
-
+                val translateX = width + 30
                 ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationX", if (left) -translateX else translateX).apply {
                     duration = 100
                     doOnEnd {
-                        setBottomSheetPeek(peek = false, animate = false)
-                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX = 0f
-                        onEndCallback.invoke()
-                        isDismissing = false
+                        onAnimationEnd()
                     }
                     start()
                 }
@@ -150,17 +138,15 @@ class MainActivity : BaseMainActivity() {
                 ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationY", translateY).apply {
                     duration = 100
                     doOnEnd {
-                        setBottomSheetPeek(peek = false, animate = false)
-                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationY = 0f
-                        onEndCallback.invoke()
-                        isDismissing = false
+                        onAnimationEnd()
                     }
                     start()
                 }
             }
 
             private fun animateToOriginalPos() {
-                ObjectAnimator.ofFloat(binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationX", 0f).apply {
+                ObjectAnimator.ofFloat(
+                    binding.bottomSheet.miniPlayer.miniPlayerContainer, "translationX", 0f).apply {
                     duration = 100
                     start()
                 }
@@ -169,18 +155,17 @@ class MainActivity : BaseMainActivity() {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
                 if (p1 != null) {
 
-                    gestureDetector.onTouchEvent(p1)
-
-                    if (p1.action == ACTION_MOVE) {
-                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX += p1.x - touchCoordinateX
-                    }
-
                     if (p1.action == ACTION_DOWN) {
                         touchCoordinateX = p1.x
+                        touchCoordinateY = p1.y
                     }
 
                     if (p1.action == ACTION_CANCEL) {
                         animateToOriginalPos()
+                    }
+
+                    if (p1.action == ACTION_MOVE) {
+                        binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX += p1.x - touchCoordinateX
                     }
 
                     if (p1.action == ACTION_UP) {
@@ -190,18 +175,24 @@ class MainActivity : BaseMainActivity() {
 
                         val movement = binding.bottomSheet.miniPlayer.miniPlayerContainer.translationX
 
-                        if (abs(movement) > getWidth() / 2) {
+                        if (abs(movement) > width / 4) {
                             dismiss(movement <= 0)
-                            return true
+                        } else {
+                            animateToOriginalPos()
                         }
-
-                        animateToOriginalPos()
                     }
+
+                    gestureDetector.onTouchEvent(p1)
                 }
 
                 return true
             }
         })
+
+        binding.bottomSheet.miniPlayer.miniPlayerContainer.setOnClickListener {
+            val behaviour = BottomSheetBehavior.from(binding.bottomSheet.standardBottomSheet)
+            behaviour.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     private fun setMediaPlayerCallbacks() {
@@ -222,7 +213,7 @@ class MainActivity : BaseMainActivity() {
                         .with(binding.root.context)
                         .load(AudioCover(currentSong._id))
                         .placeholder(R.drawable.songs)
-                        .transform(CenterCrop(), RoundedCorners(16))
+                        .transform(RoundedCorners(16))
                         .signature(MediaStoreSignature("", currentSong.modified, 0))
                         .into(binding.bottomSheet.miniPlayer.coverImage)
 
