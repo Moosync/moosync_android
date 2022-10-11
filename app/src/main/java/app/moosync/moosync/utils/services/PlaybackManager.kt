@@ -47,8 +47,6 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
     }
 
     fun loadData(mContext: Context, data: Any, autoPlay: Boolean) {
-        activePlayer.stop()
-
         if (data is Song) {
             if (data.playbackUrl != null) {
                 switchActivePlayer(data.type)

@@ -15,9 +15,13 @@ class LocalPlayer : GenericPlayer() {
     get() = playerInstance.currentPosition
     set(value) { playerInstance.seekTo(value) }
 
+    private var ignoreSongEnded = false
 
     override val isPlaying: Boolean
         get() = playerInstance.isPlaying
+
+    private var isPlayerPrepared = false
+    private val afterPreparedMethodCalls: MutableList<() -> Unit> = mutableListOf()
 
 
     override fun canPlayData(data: Any): Boolean {
@@ -31,7 +35,24 @@ class LocalPlayer : GenericPlayer() {
         )
     }
 
+    private fun runAfterPlayerPrepared(method: () -> Unit) {
+        if (isPlayerPrepared) {
+            method.invoke()
+            return
+        }
+        afterPreparedMethodCalls.add(method)
+    }
+
+    private fun runQueuedMethods() {
+        for (method in afterPreparedMethodCalls) {
+            method.invoke()
+        }
+    }
+
     override fun load(mContext: Context, data: Any, autoPlay: Boolean) {
+        ignoreSongEnded = true
+        isPlayerPrepared = false
+
         playerInstance.reset()
 
         if (data is String) {
@@ -40,7 +61,12 @@ class LocalPlayer : GenericPlayer() {
             playerInstance.setDataSource(mContext, data)
         }
 
-        playerInstance.setOnPreparedListener { if (autoPlay) it.start() }
+        playerInstance.setOnPreparedListener {
+            if (autoPlay) it.start()
+
+            isPlayerPrepared = true
+            runQueuedMethods()
+        }
         playerInstance.prepareAsync()
     }
 
@@ -54,7 +80,10 @@ class LocalPlayer : GenericPlayer() {
 
     override fun setPlayerListeners(playerListeners: PlayerListeners) {
         playerInstance.setOnCompletionListener {
-            playerListeners.onSongEnded()
+            if (!ignoreSongEnded)  {
+                playerListeners.onSongEnded()
+                ignoreSongEnded = false
+            }
         }
 
         progressTimer = Timer()
@@ -73,11 +102,15 @@ class LocalPlayer : GenericPlayer() {
     }
 
     override fun play() {
-        playerInstance.start()
+        runAfterPlayerPrepared {
+            playerInstance.start()
+        }
     }
 
     override fun pause() {
-        playerInstance.pause()
+        runAfterPlayerPrepared {
+            playerInstance.pause()
+        }
     }
 
     override fun stop() {

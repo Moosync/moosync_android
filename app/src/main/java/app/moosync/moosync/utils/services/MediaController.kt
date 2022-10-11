@@ -45,10 +45,10 @@ class MediaController(private val mContext: Context, private val foregroundServi
         emitCallbackMethod(CallbackMethods.ON_TIME_CHANGE, time)
     }
 
-    private fun handleSongChange(songIndex: Int) {
-        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, songIndex)
+    private fun handleSongChange(song: Song) {
+        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, queue.currentSongIndex)
 
-        mediaSessionHandler.updateMetadata(queue.currentSong)
+        mediaSessionHandler.updateMetadata(song)
         mediaSessionHandler.updatePlayerState(true)
         notificationManager.updateMetadata()
     }
@@ -161,11 +161,11 @@ class MediaController(private val mContext: Context, private val foregroundServi
         })
 
         queue = Queue(callbacks = object : Queue.QueueCallbacks {
-            override fun onCurrentSongChange(newIndex: Int) {
-                handleSongChange(newIndex)
+            override fun onCurrentSongChange(song: Song) {
+                handleSongChange(song)
 
                 val autoPlay = playerState == PlaybackState.PLAYING
-                playbackManager.loadData(mContext, queue.currentSong, autoPlay)
+                playbackManager.loadData(mContext, song, autoPlay)
             }
 
             override fun onQueueChange() {

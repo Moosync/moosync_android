@@ -1,12 +1,15 @@
 package app.moosync.moosync.utils.services
 
+import android.util.Log
 import app.moosync.moosync.utils.models.Song
 
 class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private val callbacks: QueueCallbacks) {
-    private var currentSongIndex: Int = -1
+     var currentSongIndex: Int = -1
         set(value) {
             field = value
-            callbacks.onCurrentSongChange(field)
+
+            Log.wtf("TAG", ": ${queueSongItems} $value")
+            callbacks.onCurrentSongChange(queueSongItems[value])
         }
 
     val currentSong: Song
@@ -14,6 +17,7 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
 
     fun playSong(song: Song) {
         currentSongIndex = addToQueue(song)
+        Log.d("TAG", "playSong: $currentSong")
     }
 
     fun addToQueue(song: Song): Int {
@@ -39,7 +43,7 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
     }
 
     interface QueueCallbacks {
-        fun onCurrentSongChange(newIndex: Int)
+        fun onCurrentSongChange(song: Song)
         fun onQueueChange()
     }
 }
