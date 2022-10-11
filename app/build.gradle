@@ -60,7 +60,7 @@ dependencies {
     implementation('org.bitbucket.ijabz:jaudiotagger:2.2.5')
 
     // Room components
-    def roomVersion = "2.5.0-alpha03"
+    def roomVersion = "2.5.0-beta01"
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
