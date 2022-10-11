@@ -20,4 +20,5 @@ abstract class GenericPlayer {
 
 interface PlayerListeners {
     fun onSongEnded()
+    fun onTimeChange(time: Int)
 }

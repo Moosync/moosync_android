@@ -6,18 +6,19 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
     private var currentSongIndex: Int = -1
         set(value) {
             field = value
-            callbacks.onCurrentSongChange(currentSong)
+            callbacks.onCurrentSongChange(field)
         }
 
-    private val currentSong: Song
+    val currentSong: Song
         get() = queueSongItems[currentSongIndex]
 
-    fun playNow(song: Song) {
+    fun playSong(song: Song) {
         currentSongIndex = addToQueue(song)
     }
 
     fun addToQueue(song: Song): Int {
         queueSongItems.add(song)
+        callbacks.onQueueChange()
         return queueSongItems.size - 1
     }
 
@@ -38,6 +39,7 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
     }
 
     interface QueueCallbacks {
-        fun onCurrentSongChange(newSong: Song)
+        fun onCurrentSongChange(newIndex: Int)
+        fun onQueueChange()
     }
 }

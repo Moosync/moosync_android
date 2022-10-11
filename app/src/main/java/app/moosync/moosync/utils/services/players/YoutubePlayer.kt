@@ -132,6 +132,7 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
 
         override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
             _progress = second.toInt()
+            playerListeners.onTimeChange(second.toInt())
         }
 
         override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {}

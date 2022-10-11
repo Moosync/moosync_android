@@ -67,9 +67,19 @@ class MediaServiceRemote private constructor(activity: Activity) {
         }
     }
 
+    fun getCurrentSong(): Song? {
+        return mediaService?.currentSong
+    }
+
     fun playSong(song: Song) {
         runOrAddToQueue {
             mediaService!!.controls.playSong(song)
+        }
+    }
+
+    fun addToQueue(song: Song) {
+        runOrAddToQueue {
+            mediaService!!.controls.addToQueue(song)
         }
     }
 

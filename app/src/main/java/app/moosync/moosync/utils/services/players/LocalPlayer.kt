@@ -5,6 +5,8 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.provider.MediaStore
+import java.util.*
+
 
 class LocalPlayer : GenericPlayer() {
     private val playerInstance = MediaPlayer()
@@ -42,14 +44,32 @@ class LocalPlayer : GenericPlayer() {
         playerInstance.prepareAsync()
     }
 
+    private var progressTimer: Timer? = null
+
+    private fun cancelProgressTimer() {
+        progressTimer?.cancel()
+        progressTimer?.purge()
+        progressTimer = null
+    }
+
     override fun setPlayerListeners(playerListeners: PlayerListeners) {
         playerInstance.setOnCompletionListener {
             playerListeners.onSongEnded()
         }
+
+        progressTimer = Timer()
+        progressTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                if (isPlaying) {
+                    playerListeners.onTimeChange(progress)
+                }
+            }
+        }, 0, 300)
     }
 
     override fun removePlayerListeners() {
         playerInstance.setOnCompletionListener(null)
+        cancelProgressTimer()
     }
 
     override fun play() {

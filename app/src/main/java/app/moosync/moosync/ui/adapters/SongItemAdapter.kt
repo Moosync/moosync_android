@@ -7,6 +7,8 @@ import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
 
 class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapter<SongListItemBinding, Song>(SongDiffCallback) {
@@ -32,6 +34,7 @@ class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapt
             .with(binding.root.context)
             .load(AudioCover(item._id))
             .placeholder(R.drawable.songs)
+            .transform(CenterCrop(), RoundedCorners(16))
             .signature(MediaStoreSignature("", item.modified, 0))
             .into(binding.coverImage)
 
