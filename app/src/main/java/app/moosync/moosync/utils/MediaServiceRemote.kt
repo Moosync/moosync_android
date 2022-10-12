@@ -67,8 +67,10 @@ class MediaServiceRemote private constructor(activity: Activity) {
         }
     }
 
-    fun getCurrentSong(): Song? {
-        return mediaService?.currentSong
+    fun getCurrentSong(callback: (song: Song?) -> Unit) {
+        runOrAddToQueue {
+            callback.invoke(it.currentSong)
+        }
     }
 
     fun playSong(song: Song) {

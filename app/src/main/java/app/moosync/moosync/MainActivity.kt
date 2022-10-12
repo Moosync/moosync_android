@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.MotionEvent.*
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.databinding.DataBindingUtil
 import app.moosync.moosync.databinding.ActivityMainBinding
 import app.moosync.moosync.ui.base.BaseMainActivity
@@ -21,7 +20,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseMainActivity() {
 
-    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
     private lateinit var binding: ActivityMainBinding
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -45,7 +43,7 @@ class MainActivity : BaseMainActivity() {
 
     private fun setupOverlayPlayers() {
         val behaviour = BottomSheetBehavior.from(binding.bottomSheet.standardBottomSheet)
-        val bottomSheetHandler = BottomSheetHandler(binding.bottomSheet, binding.themedBottomNavigationView)
+        val bottomSheetHandler = BottomSheetHandler(this, binding.bottomSheet, binding.themedBottomNavigationView)
         bottomSheetHandler.setupBottomSheet()
         MiniBarPlayerHandler(this, binding.bottomSheet.miniPlayer, behaviour, bottomSheetHandler::setBottomSheetPeek).setupMiniBar()
     }
@@ -57,9 +55,6 @@ class MainActivity : BaseMainActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true
-        }
         return super.onOptionsItemSelected(item)
     }
 }

@@ -12,6 +12,7 @@ import app.moosync.moosync.databinding.NowPlayingMiniBarBinding
 import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
+import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
@@ -21,14 +22,21 @@ import kotlin.math.abs
 class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val miniBarBinding: NowPlayingMiniBarBinding, private val bottomSheetBehavior: BottomSheetBehavior<FrameLayout>, private val bottomSheetPeekHandler: (peek: Boolean, animate: Boolean) -> Unit) {
 
     fun setupMiniBar() {
-        bottomSheetPeekHandler(false, false)
-
         setMediaPlayerCallbacks()
         setupMiniPlayerSlideGestures {
             mainActivity.getMediaRemote()?.stopPlayback()
         }
         setMediaPlayerCallbacks()
         setupMiniPlayerButtons()
+        miniBarInitialSetup()
+    }
+
+    private fun miniBarInitialSetup() {
+        mainActivity.getMediaRemote()?.getCurrentSong { song ->
+            if (song != null) {
+                setMiniBarPlayerDetails(song)
+            }
+        }
     }
 
     private fun setupMiniPlayerButtons() {
@@ -41,29 +49,33 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
         }
     }
 
+    private fun setMiniBarPlayerDetails(currentSong: Song) {
+        miniBarBinding.songTitle.text = currentSong.title
+        miniBarBinding.songSubtitle.text = currentSong.artist?.toArtistString() ?: ""
+        with(miniBarBinding.seekbar) {
+            max = currentSong.duration.toInt()
+            min = 0
+            progress = 0
+        }
+
+        GlideApp
+            .with(miniBarBinding.root.context)
+            .load(AudioCover(currentSong._id))
+            .placeholder(R.drawable.songs)
+            .transform(RoundedCorners(16))
+            .signature(MediaStoreSignature("", currentSong.modified, 0))
+            .into(miniBarBinding.coverImage)
+    }
+
     private fun setMediaPlayerCallbacks() {
         mainActivity.getMediaRemote()?.addMediaCallbacks(object: MediaPlayerCallbacks {
             override fun onSongChange(songIndex: Int) {
-                val currentSong = mainActivity.getMediaRemote()?.getCurrentSong()
-                if (currentSong != null) {
+                mainActivity.getMediaRemote()?.getCurrentSong() { currentSong ->
+                    if (currentSong != null) {
 
-                    miniBarBinding.songTitle.text = currentSong.title
-                    miniBarBinding.songSubtitle.text = currentSong.artist?.toArtistString() ?: ""
-                    with(miniBarBinding.seekbar) {
-                        max = currentSong.duration.toInt()
-                        min = 0
-                        progress = 0
+                        setMiniBarPlayerDetails(currentSong)
+                        bottomSheetPeekHandler(true, true)
                     }
-
-                    GlideApp
-                        .with(miniBarBinding.root.context)
-                        .load(AudioCover(currentSong._id))
-                        .placeholder(R.drawable.songs)
-                        .transform(RoundedCorners(16))
-                        .signature(MediaStoreSignature("", currentSong.modified, 0))
-                        .into(miniBarBinding.coverImage)
-
-                    bottomSheetPeekHandler(true, true)
                 }
             }
 

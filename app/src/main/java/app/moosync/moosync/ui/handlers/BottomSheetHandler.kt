@@ -2,18 +2,32 @@ package app.moosync.moosync.ui.handlers
 
 import android.animation.ObjectAnimator
 import android.view.View
+import app.moosync.moosync.MainActivity
 import app.moosync.moosync.databinding.BottomSheetLayoutBinding
 import app.moosync.moosync.ui.views.ThemedBottomNavigationView
+import app.moosync.moosync.utils.helpers.onCreated
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
-class BottomSheetHandler(private val bottomSheetBinding: BottomSheetLayoutBinding, private val themedBottomNavigationView: ThemedBottomNavigationView) {
+class BottomSheetHandler(private val mainActivity: MainActivity, private val bottomSheetBinding: BottomSheetLayoutBinding, private val themedBottomNavigationView: ThemedBottomNavigationView) {
+    private val bottomSheetBehavior
+    get() = BottomSheetBehavior.from(bottomSheetBinding.standardBottomSheet)
+
     fun setupBottomSheet() {
+        initialBottomSheetSetup()
         setupBottomSheetBehaviour()
     }
 
-    private fun setupBottomSheetBehaviour() {
-        setBottomSheetPeek(peek = false, animate = false)
+    private fun initialBottomSheetSetup() {
+        mainActivity.getMediaRemote()?.getCurrentSong { song ->
+            if (song != null) {
+                setBottomSheetPeek(peek = true, animate = true)
+            } else {
+                setBottomSheetPeek(peek = false, animate = false)
+            }
+        }
+    }
 
+    private fun setupBottomSheetBehaviour() {
         val behaviour = BottomSheetBehavior.from(bottomSheetBinding.standardBottomSheet)
         behaviour.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {}
@@ -29,17 +43,17 @@ class BottomSheetHandler(private val bottomSheetBinding: BottomSheetLayoutBindin
     }
 
     fun setBottomSheetPeek(peek: Boolean, animate: Boolean = true) {
-        val behaviour = BottomSheetBehavior.from(bottomSheetBinding.standardBottomSheet)
-
-        if (peek) {
-            ObjectAnimator.ofInt(behaviour, "peekHeight", themedBottomNavigationView.height + bottomSheetBinding.miniPlayer.miniPlayerContainer.height + 20).apply {
-                duration = if (animate) 300 else 0
-                start()
-            }
-        } else {
-            ObjectAnimator.ofInt(behaviour, "peekHeight", 0).apply {
-                duration = if (animate) 300 else 0
-                start()
+        bottomSheetBinding.miniPlayer.miniPlayerContainer.onCreated {
+            if (peek) {
+                ObjectAnimator.ofInt(bottomSheetBehavior, "peekHeight", themedBottomNavigationView.height + bottomSheetBinding.miniPlayer.miniPlayerContainer.height + 20).apply {
+                    duration = if (animate) 300 else 0
+                    start()
+                }
+            } else {
+                ObjectAnimator.ofInt(bottomSheetBehavior, "peekHeight", 0).apply {
+                    duration = if (animate) 300 else 0
+                    start()
+                }
             }
         }
     }

@@ -12,8 +12,8 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
             callbacks.onCurrentSongChange(queueSongItems[value])
         }
 
-    val currentSong: Song
-        get() = queueSongItems[currentSongIndex]
+    val currentSong: Song?
+        get() = if (currentSongIndex >= 0) queueSongItems[currentSongIndex] else null
 
     fun playSong(song: Song) {
         currentSongIndex = addToQueue(song)
