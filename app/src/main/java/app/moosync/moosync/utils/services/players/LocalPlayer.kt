@@ -65,6 +65,7 @@ class LocalPlayer : GenericPlayer() {
             if (autoPlay) it.start()
 
             isPlayerPrepared = true
+            ignoreSongEnded = false
             runQueuedMethods()
         }
         playerInstance.prepareAsync()
