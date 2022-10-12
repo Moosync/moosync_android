@@ -34,10 +34,12 @@ class BottomSheetHandler(private val mainActivity: MainActivity, private val bot
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 themedBottomNavigationView.alpha = 1 - slideOffset
-                themedBottomNavigationView.translationY = themedBottomNavigationView.height * slideOffset * (5/2)
+                themedBottomNavigationView.translationY =
+                    themedBottomNavigationView.height * slideOffset * (5 / 2)
 
                 bottomSheetBinding.nowPlaying.nowPlayingContainer.alpha = slideOffset * 3
-                bottomSheetBinding.miniPlayer.miniPlayerContainer.alpha = (1 - slideOffset * 3) // Should disappear before 0.32
+                bottomSheetBinding.miniPlayer.miniPlayerContainer.alpha =
+                    (1 - slideOffset * 3) // Should disappear before 0.32
             }
         })
     }
