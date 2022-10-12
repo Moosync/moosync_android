@@ -19,6 +19,10 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
     get() { return activePlayer.progress }
     set(value) { activePlayer.progress = value }
 
+    init {
+        activePlayer.setPlayerListeners(playerListeners)
+    }
+
     val isPlaying: Boolean
         get() = activePlayer.isPlaying
 
@@ -41,9 +45,11 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
     }
 
     private fun switchActivePlayer(newType: PlayerTypes) {
-        activePlayer.removePlayerListeners()
-        activePlayerType = newType
-        activePlayer.setPlayerListeners(playerListeners)
+        if (activePlayerType != newType) {
+            activePlayer.removePlayerListeners()
+            activePlayerType = newType
+            activePlayer.setPlayerListeners(playerListeners)
+        }
     }
 
     fun loadData(mContext: Context, data: Any, autoPlay: Boolean) {
