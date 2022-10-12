@@ -12,6 +12,7 @@ import androidx.media.MediaBrowserServiceCompat
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.Constants.NOTIFICATION_ID
+import app.moosync.moosync.utils.PlaybackState
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaControls
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
@@ -123,6 +124,9 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
 
             override val currentSong: Song
                 get() = this@MediaPlayerService.mediaController.queue.currentSong
+
+            override val playbackState: PlaybackState
+                get() = this@MediaPlayerService.mediaController.playerState
 
             override fun decideQuit() {
                 this@MediaPlayerService.decideQuit()

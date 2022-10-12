@@ -15,14 +15,14 @@ class MediaServiceRemote private constructor(activity: Activity) {
     private val mContextWrapper: ContextWrapper = ContextWrapper(activity)
     private val serviceConnection: ServiceConnection
 
-    private val methodQueue: MutableList<() -> Unit> = mutableListOf()
+    private val methodQueue: MutableList<(mediaService: MediaServiceWrapper) -> Unit> = mutableListOf()
 
     init {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 val binder = p1 as MediaPlayerService.MediaPlayerBinder?
                 mediaService = binder?.service
-                runFromMethodQueue()
+                mediaService?.let { runFromMethodQueue(it) }
             }
 
             override fun onServiceDisconnected(p0: ComponentName?) {
@@ -33,21 +33,21 @@ class MediaServiceRemote private constructor(activity: Activity) {
         bindService()
     }
 
-    private fun runFromMethodQueue() {
+    private fun runFromMethodQueue(mediaService: MediaServiceWrapper) {
         for (method in methodQueue) {
-            method.invoke()
+            method.invoke(mediaService)
         }
     }
 
-    private fun runOrAddToQueue(method: () -> Unit) {
+    private fun runOrAddToQueue(method: (mediaService: MediaServiceWrapper) -> Unit) {
         if (mediaService == null) {
             methodQueue.add {
-                method.invoke()
+                method.invoke(it)
             }
             return
         }
 
-        method.invoke()
+        method.invoke(mediaService!!)
     }
 
     private fun bindService() {
@@ -73,25 +73,41 @@ class MediaServiceRemote private constructor(activity: Activity) {
 
     fun playSong(song: Song) {
         runOrAddToQueue {
-            mediaService!!.controls.playSong(song)
+            it.controls.playSong(song)
         }
     }
 
     fun addToQueue(song: Song) {
         runOrAddToQueue {
-            mediaService!!.controls.addToQueue(song)
+            it.controls.addToQueue(song)
+        }
+    }
+
+    fun togglePlay() {
+        runOrAddToQueue {
+            if (it.playbackState == PlaybackState.PLAYING) {
+                it.controls.pause()
+            } else {
+                it.controls.play()
+            }
+        }
+    }
+
+    fun shuffleQueue() {
+        runOrAddToQueue {
+            it.controls.shuffleQueue()
         }
     }
 
     fun addMediaCallbacks(callbacks: MediaPlayerCallbacks) {
         runOrAddToQueue {
-            mediaService!!.addMediaPlayerCallbacks(callbacks)
+            it.addMediaPlayerCallbacks(callbacks)
         }
     }
 
     fun stopPlayback() {
         runOrAddToQueue {
-            mediaService!!.controls.stop()
+            it.controls.stop()
         }
     }
 

@@ -42,6 +42,10 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
         }
     }
 
+    fun shuffle() {
+        queueSongItems.shuffle()
+    }
+
     interface QueueCallbacks {
         fun onCurrentSongChange(song: Song)
         fun onQueueChange()

@@ -31,7 +31,7 @@ class MediaController(private val mContext: Context, private val foregroundServi
     // Exposed controller abstraction for app to control media playback
     val controls: MediaControls
 
-    private var playerState: PlaybackState = PlaybackState.STOPPED
+    var playerState: PlaybackState = PlaybackState.STOPPED
 
     private val playbackManager: PlaybackManager
 
@@ -193,6 +193,10 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
             override fun previous() {
                 queue.previous()
+            }
+
+            override fun shuffleQueue() {
+                queue.shuffle()
             }
 
             override fun playSong(song: Song) {

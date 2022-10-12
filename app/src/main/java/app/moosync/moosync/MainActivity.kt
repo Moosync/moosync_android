@@ -3,12 +3,9 @@ package app.moosync.moosync
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
-import android.view.GestureDetector
+import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.MotionEvent.*
-import android.view.View
 import android.view.View.OnTouchListener
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.animation.doOnEnd
@@ -78,6 +75,18 @@ class MainActivity : BaseMainActivity() {
         setMediaPlayerCallbacks()
         setupMiniPlayerSlideGestures {
             getMediaRemote()?.stopPlayback()
+        }
+
+        setupMiniPlayerButtons()
+    }
+
+    private fun setupMiniPlayerButtons() {
+        binding.bottomSheet.miniPlayer.playPauseButton.setOnClickListener {
+            getMediaRemote()?.togglePlay()
+        }
+
+        binding.bottomSheet.miniPlayer.shuffleButton.setOnClickListener {
+            getMediaRemote()?.shuffleQueue()
         }
     }
 
@@ -228,7 +237,25 @@ class MainActivity : BaseMainActivity() {
             override fun onTimeChange(time: Int) {
                 binding.bottomSheet.miniPlayer.seekbar.progress = time
             }
+
+            override fun onPlay() {
+                loadPlayPauseDrawable(false)
+            }
+
+            override fun onPause() {
+                loadPlayPauseDrawable(true)
+            }
         })
+    }
+
+    private fun loadPlayPauseDrawable(showPlay: Boolean) {
+        val v1 = if (showPlay) binding.bottomSheet.miniPlayer.pauseButton else binding.bottomSheet.miniPlayer.playButton
+        val v2 = if (showPlay) binding.bottomSheet.miniPlayer.playButton else binding.bottomSheet.miniPlayer.pauseButton
+
+        v1.animate().alpha(0f).setDuration(300).start()
+        v2.animate().alpha(1f).setDuration(300).start()
+
+        v2.bringToFront()
     }
 
     private fun setBottomSheetPeek(peek: Boolean, animate: Boolean = true) {
