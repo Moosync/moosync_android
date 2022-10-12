@@ -97,6 +97,9 @@ class MediaController(private val mContext: Context, private val foregroundServi
     private fun seekToPos(pos: Int) {
         playbackManager.songProgress = pos
         changePlaybackState(PlaybackState.PLAYING)
+
+        mediaSessionHandler.updatePlayerState(true, playbackManager.songProgress)
+        notificationManager.updateMetadata()
     }
 
     fun decideQuit(): Boolean {
