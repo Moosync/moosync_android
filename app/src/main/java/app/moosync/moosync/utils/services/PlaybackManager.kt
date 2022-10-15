@@ -46,6 +46,7 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
 
     private fun switchActivePlayer(newType: PlayerTypes) {
         if (activePlayerType != newType) {
+            activePlayer.stop()
             activePlayer.removePlayerListeners()
             activePlayerType = newType
             activePlayer.setPlayerListeners(playerListeners)
