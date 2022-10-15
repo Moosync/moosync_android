@@ -18,4 +18,7 @@
     <string name="play">Play</string>
     <string name="cover_image">Cover image</string>
     <string name="pause">Pause</string>
+    <string name="repeat">Repeat</string>
+    <string name="skip_back">Skip back</string>
+    <string name="skip_forward">Skip Forward</string>
 </resources>
