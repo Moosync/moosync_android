@@ -3,6 +3,7 @@ package app.moosync.moosync.ui.base
 import androidx.fragment.app.Fragment
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.utils.MediaServiceRemote
+import app.moosync.moosync.utils.services.interfaces.MediaControls
 
 abstract class BaseFragment: Fragment() {
     fun getMediaRemote(): MediaServiceRemote? {
@@ -12,5 +13,9 @@ abstract class BaseFragment: Fragment() {
         }
 
         return null
+    }
+
+    fun getMediaControls(): MediaControls? {
+        return this.getMediaRemote()?.controls
     }
 }

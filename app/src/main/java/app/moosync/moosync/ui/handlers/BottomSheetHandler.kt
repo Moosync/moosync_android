@@ -7,6 +7,9 @@ import app.moosync.moosync.databinding.BottomSheetLayoutBinding
 import app.moosync.moosync.ui.views.ThemedBottomNavigationView
 import app.moosync.moosync.utils.helpers.onCreated
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BottomSheetHandler(private val mainActivity: MainActivity, private val bottomSheetBinding: BottomSheetLayoutBinding, private val themedBottomNavigationView: ThemedBottomNavigationView) {
     private val bottomSheetBehavior
@@ -18,7 +21,8 @@ class BottomSheetHandler(private val mainActivity: MainActivity, private val bot
     }
 
     private fun initialBottomSheetSetup() {
-        mainActivity.getMediaRemote()?.getCurrentSong { song ->
+        CoroutineScope(Dispatchers.Main).launch {
+            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
             if (song != null) {
                 setBottomSheetPeek(peek = true, animate = true)
             } else {

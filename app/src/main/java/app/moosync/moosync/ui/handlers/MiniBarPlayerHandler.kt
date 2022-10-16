@@ -17,6 +17,9 @@ import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val miniBarBinding: NowPlayingMiniBarBinding, private val bottomSheetBehavior: BottomSheetBehavior<FrameLayout>, private val bottomSheetPeekHandler: (peek: Boolean, animate: Boolean) -> Unit) {
@@ -24,7 +27,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
     fun setupMiniBar() {
         setMediaPlayerCallbacks()
         setupMiniPlayerSlideGestures {
-            mainActivity.getMediaRemote()?.stopPlayback()
+            mainActivity.getMediaControls()?.stop()
         }
         setMediaPlayerCallbacks()
         setupMiniPlayerButtons()
@@ -32,7 +35,8 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
     }
 
     private fun miniBarInitialSetup() {
-        mainActivity.getMediaRemote()?.getCurrentSong { song ->
+        CoroutineScope(Dispatchers.Main).launch {
+            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
             if (song != null) {
                 setMiniBarPlayerDetails(song)
             }
@@ -41,11 +45,11 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
 
     private fun setupMiniPlayerButtons() {
         miniBarBinding.playPauseButton.setOnClickListener {
-            mainActivity.getMediaRemote()?.togglePlay()
+            mainActivity.getMediaControls()?.togglePlay()
         }
 
         miniBarBinding.shuffleButton.setOnClickListener {
-            mainActivity.getMediaRemote()?.shuffleQueue()
+            mainActivity.getMediaControls()?.shuffleQueue()
         }
     }
 
@@ -69,13 +73,10 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
 
     private fun setMediaPlayerCallbacks() {
         mainActivity.getMediaRemote()?.addMediaCallbacks(object: MediaPlayerCallbacks {
-            override fun onSongChange(songIndex: Int) {
-                mainActivity.getMediaRemote()?.getCurrentSong() { currentSong ->
-                    if (currentSong != null) {
-
-                        setMiniBarPlayerDetails(currentSong)
-                        bottomSheetPeekHandler(true, true)
-                    }
+            override fun onSongChange(song: Song?) {
+                if (song != null) {
+                    setMiniBarPlayerDetails(song)
+                    bottomSheetPeekHandler(true, true)
                 }
             }
 

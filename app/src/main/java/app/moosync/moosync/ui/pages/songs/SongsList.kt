@@ -27,9 +27,9 @@ class SongsList : BaseFragment() {
 
         val adapter = SongItemAdapter {
             if (it == Song.emptySong) {
-                getMediaRemote()?.stopPlayback()
+                getMediaControls()?.stop()
             } else {
-                getMediaRemote()?.playSong(it)
+                getMediaControls()?.playSong(it)
             }
         }
         binding.songsList.adapter = adapter

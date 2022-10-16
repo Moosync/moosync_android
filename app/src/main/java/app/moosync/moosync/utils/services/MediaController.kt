@@ -46,7 +46,7 @@ class MediaController(private val mContext: Context, private val foregroundServi
     }
 
     private fun handleSongChange(song: Song) {
-        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, queue.currentSongIndex)
+        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, queue.currentSong)
 
         mediaSessionHandler.updateMetadata(song)
         mediaSessionHandler.updatePlayerState(true)
@@ -111,13 +111,13 @@ class MediaController(private val mContext: Context, private val foregroundServi
         mediaPlayerCallbacks.add(callbacks)
     }
 
-    private fun emitCallbackMethod(method: CallbackMethods, vararg args: Any) {
+    private fun emitCallbackMethod(method: CallbackMethods, vararg args: Any?) {
         for (callback in this.mediaPlayerCallbacks) {
             when (method) {
                 CallbackMethods.ON_PLAY -> callback.onPlay()
                 CallbackMethods.ON_PAUSE -> callback.onPause()
                 CallbackMethods.ON_STOP -> callback.onStop()
-                CallbackMethods.ON_SONG_CHANGE -> callback.onSongChange(args[0] as Int)
+                CallbackMethods.ON_SONG_CHANGE -> callback.onSongChange(args[0] as Song)
                 CallbackMethods.ON_QUEUE_CHANGE -> callback.onQueueChange()
                 CallbackMethods.ON_TIME_CHANGE -> callback.onTimeChange(args[0] as Int)
             }
@@ -209,6 +209,14 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
             override fun addToQueue(song: Song) {
                 queue.addToQueue(song)
+            }
+
+            override fun togglePlay() {
+                if (playerState === PlaybackState.PLAYING) {
+                    this.pause()
+                } else {
+                    this.play()
+                }
             }
         }
     }

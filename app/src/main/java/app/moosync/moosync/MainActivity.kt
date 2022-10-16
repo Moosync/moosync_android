@@ -2,8 +2,6 @@ package app.moosync.moosync
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.view.MotionEvent.*
 import androidx.databinding.DataBindingUtil
 import app.moosync.moosync.databinding.ActivityMainBinding
 import app.moosync.moosync.ui.base.BaseMainActivity
@@ -14,16 +12,14 @@ import app.moosync.moosync.utils.db.repository.SongRepository
 import app.moosync.moosync.utils.helpers.AudioScanner
 import app.moosync.moosync.utils.helpers.PermissionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseMainActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -31,8 +27,7 @@ class MainActivity : BaseMainActivity() {
         setupOverlayPlayers()
 
         PermissionManager(this).requestPermission {
-            // TODO: Decide which scope would be better
-            GlobalScope.launch(Dispatchers.IO) {
+            CoroutineScope(Dispatchers.IO).launch {
                 val songs = AudioScanner().readDirectory(this@MainActivity)
                 val repo = SongRepository(this@MainActivity)
                 repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())

@@ -5,6 +5,7 @@ import app.moosync.moosync.utils.models.Song
 interface MediaControls {
     fun play()
     fun pause()
+    fun togglePlay()
     fun stop()
     fun next()
     fun previous()

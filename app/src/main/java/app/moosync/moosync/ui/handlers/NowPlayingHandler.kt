@@ -11,31 +11,39 @@ import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NowPlayingHandler(private val mainActivity: MainActivity, private val nowPlayingLayoutBinding: NowPlayingLayoutBinding): BaseFragment() {
 
     fun setupNowPlaying() {
         setNowPlayingCallbacks()
-        setupMiniPlayerButtons()
+        setupButtons()
         nowPlayingInitialSetup()
     }
 
     private fun nowPlayingInitialSetup() {
-        mainActivity.getMediaRemote()?.getCurrentSong { song ->
+        CoroutineScope(Dispatchers.Main).launch {
+            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
             if (song != null) {
                 setNowPlayingDetails(song)
             }
         }
     }
 
-    private fun setupMiniPlayerButtons() {
+    private fun setupButtons() {
         nowPlayingLayoutBinding.playPauseButton.setOnClickListener {
-            mainActivity.getMediaRemote()?.togglePlay()
+            mainActivity.getMediaControls()?.togglePlay()
         }
 
         nowPlayingLayoutBinding.shuffleButton.setOnClickListener {
-            mainActivity.getMediaRemote()?.shuffleQueue()
+            mainActivity.getMediaControls()?.shuffleQueue()
         }
+
+//        nowPlayingLayoutBinding.skipNext.setOnClickListener {
+//            mainActivity.getMediaRemote()?.
+//        }
     }
 
     private fun setNowPlayingDetails(currentSong: Song) {
@@ -58,12 +66,11 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
 
     private fun setNowPlayingCallbacks() {
         mainActivity.getMediaRemote()?.addMediaCallbacks(object: MediaPlayerCallbacks {
-            override fun onSongChange(songIndex: Int) {
-                mainActivity.getMediaRemote()?.getCurrentSong { currentSong ->
-                    if (currentSong != null) {
-                        setNowPlayingDetails(currentSong)
-                    }
+            override fun onSongChange(song: Song?) {
+                if (song != null) {
+                    setNowPlayingDetails(song)
                 }
+
             }
 
             override fun onTimeChange(time: Int) {
