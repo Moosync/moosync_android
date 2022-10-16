@@ -37,4 +37,8 @@ class ThemedCardLayout(context: Context, attrs: AttributeSet?) : CardView(contex
         super.onAttachedToWindow()
     }
 
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
+
 }
