@@ -55,8 +55,4 @@ class MainActivity : BaseMainActivity() {
         getMediaRemote()?.release()
         super.onDestroy()
     }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
-    }
 }
