@@ -9,6 +9,7 @@ import app.moosync.moosync.databinding.ActivityMainBinding
 import app.moosync.moosync.ui.base.BaseMainActivity
 import app.moosync.moosync.ui.handlers.BottomSheetHandler
 import app.moosync.moosync.ui.handlers.MiniBarPlayerHandler
+import app.moosync.moosync.ui.handlers.NowPlayingHandler
 import app.moosync.moosync.utils.db.repository.SongRepository
 import app.moosync.moosync.utils.helpers.AudioScanner
 import app.moosync.moosync.utils.helpers.PermissionManager
@@ -46,6 +47,7 @@ class MainActivity : BaseMainActivity() {
         val bottomSheetHandler = BottomSheetHandler(this, binding.bottomSheet, binding.themedBottomNavigationView)
         bottomSheetHandler.setupBottomSheet()
         MiniBarPlayerHandler(this, binding.bottomSheet.miniPlayer, behaviour, bottomSheetHandler::setBottomSheetPeek).setupMiniBar()
+        NowPlayingHandler(this, binding.bottomSheet.nowPlaying).setupNowPlaying()
     }
 
     override fun onDestroy() {
