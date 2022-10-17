@@ -10,7 +10,10 @@ interface MediaControls {
     fun next()
     fun previous()
 
+    fun seek(time: Int)
+
     fun shuffleQueue()
+    fun repeat()
 
     fun playSong(song: Song)
     fun addToQueue(song: Song)

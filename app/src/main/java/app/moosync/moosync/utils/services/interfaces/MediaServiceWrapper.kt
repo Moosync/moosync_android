@@ -7,6 +7,7 @@ interface MediaServiceWrapper {
     val controls: MediaControls
     val currentSong: Song?
     val playbackState: PlaybackState
+    val repeat: Boolean
 
     fun decideQuit()
 

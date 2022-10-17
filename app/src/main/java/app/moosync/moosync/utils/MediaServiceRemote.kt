@@ -100,7 +100,7 @@ class MediaServiceRemote private constructor(activity: Activity) {
         scope: CoroutineScope = CoroutineScope(
             Dispatchers.Default
         ), crossinline method: (mediaService: MediaServiceWrapper) -> T
-    ): Deferred<T?> = scope.async {
+    ): Deferred<T> = scope.async {
         if (mediaService == null) {
 
             val channel: Channel<T?> = Channel()
@@ -141,6 +141,12 @@ class MediaServiceRemote private constructor(activity: Activity) {
     fun getCurrentSongAsync(scope: CoroutineScope): Deferred<Song?> {
         return runOrAddToQueueAsync(scope) {
             return@runOrAddToQueueAsync it.currentSong
+        }
+    }
+
+    fun getRepeatAsync(scope: CoroutineScope): Deferred<Boolean> {
+        return runOrAddToQueueAsync(scope) {
+            return@runOrAddToQueueAsync it.repeat
         }
     }
 

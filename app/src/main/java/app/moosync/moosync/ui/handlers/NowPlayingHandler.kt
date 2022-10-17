@@ -1,5 +1,7 @@
 package app.moosync.moosync.ui.handlers
 
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.NowPlayingLayoutBinding
@@ -7,6 +9,7 @@ import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.ui.base.BaseFragment
 import app.moosync.moosync.utils.helpers.toArtistString
+import app.moosync.moosync.utils.helpers.toTimeString
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -17,6 +20,8 @@ import kotlinx.coroutines.launch
 
 class NowPlayingHandler(private val mainActivity: MainActivity, private val nowPlayingLayoutBinding: NowPlayingLayoutBinding): BaseFragment() {
 
+    private var isSeeking = false
+
     fun setupNowPlaying() {
         setNowPlayingCallbacks()
         setupButtons()
@@ -25,10 +30,13 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
 
     private fun nowPlayingInitialSetup() {
         CoroutineScope(Dispatchers.Main).launch {
-            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
+            val song = mainActivity.getMediaRemote().getCurrentSongAsync(this).await()
             if (song != null) {
                 setNowPlayingDetails(song)
             }
+
+            val repeat = mainActivity.getMediaRemote().getRepeatAsync(this).await()
+            setRepeat(repeat)
         }
     }
 
@@ -41,9 +49,43 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
             mainActivity.getMediaControls()?.shuffleQueue()
         }
 
-//        nowPlayingLayoutBinding.skipNext.setOnClickListener {
-//            mainActivity.getMediaRemote()?.
-//        }
+        nowPlayingLayoutBinding.skipNext.setOnClickListener {
+            mainActivity.getMediaControls()?.next()
+        }
+
+        nowPlayingLayoutBinding.skipPrev.setOnClickListener {
+            mainActivity.getMediaControls()?.previous()
+        }
+
+        nowPlayingLayoutBinding.shuffleButton.setOnClickListener {
+            mainActivity.getMediaControls()?.shuffleQueue()
+        }
+
+        nowPlayingLayoutBinding.repeatButton.setOnClickListener {
+            mainActivity.getMediaControls()?.repeat()
+        }
+
+        nowPlayingLayoutBinding.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                if (isSeeking) {
+                    nowPlayingLayoutBinding.currentTime.text = p1.toTimeString()
+                    mainActivity.getMediaControls()?.seek(p1)
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+                isSeeking = true
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+                isSeeking = false
+            }
+
+        })
+    }
+
+    private fun setRepeat(repeat: Boolean) {
+        // TODO: Set repeat button
     }
 
     private fun setNowPlayingDetails(currentSong: Song) {
@@ -55,6 +97,9 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
             progress = 0
         }
 
+        nowPlayingLayoutBinding.totalTime.text = currentSong.duration.toInt().toTimeString()
+        nowPlayingLayoutBinding.currentTime.text = "0:00"
+
         GlideApp
             .with(nowPlayingLayoutBinding.root.context)
             .load(AudioCover(currentSong._id))
@@ -65,16 +110,18 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
     }
 
     private fun setNowPlayingCallbacks() {
-        mainActivity.getMediaRemote()?.addMediaCallbacks(object: MediaPlayerCallbacks {
+        mainActivity.getMediaRemote().addMediaCallbacks(object: MediaPlayerCallbacks {
             override fun onSongChange(song: Song?) {
                 if (song != null) {
                     setNowPlayingDetails(song)
                 }
-
             }
 
             override fun onTimeChange(time: Int) {
-                nowPlayingLayoutBinding.seekbar.progress = time
+                if (!isSeeking) {
+                    nowPlayingLayoutBinding.seekbar.progress = time
+                    nowPlayingLayoutBinding.currentTime.text = time.toTimeString()
+                }
             }
 
             override fun onPlay() {

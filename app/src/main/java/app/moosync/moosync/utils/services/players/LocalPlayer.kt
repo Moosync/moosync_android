@@ -4,6 +4,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import java.util.*
 
@@ -87,14 +89,17 @@ class LocalPlayer : GenericPlayer() {
             }
         }
 
-        progressTimer = Timer()
-        progressTimer!!.scheduleAtFixedRate(object : TimerTask() {
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = object: Runnable {
             override fun run() {
                 if (isPlaying) {
                     playerListeners.onTimeChange(progress)
                 }
+                handler.postDelayed(this, 300)
             }
-        }, 0, 300)
+        }
+
+        runnable.run()
     }
 
     override fun removePlayerListeners() {

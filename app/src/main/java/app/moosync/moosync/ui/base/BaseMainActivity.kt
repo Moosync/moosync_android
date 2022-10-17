@@ -5,19 +5,19 @@ import app.moosync.moosync.utils.MediaServiceRemote
 import app.moosync.moosync.utils.services.interfaces.MediaControls
 
 abstract class BaseMainActivity : BaseActivity() {
-    private var mediaServiceRemote: MediaServiceRemote? = null
+    private lateinit var mediaServiceRemote: MediaServiceRemote
 
-    fun getMediaRemote(): MediaServiceRemote? {
+    fun getMediaRemote(): MediaServiceRemote {
         return mediaServiceRemote
     }
 
     fun getMediaControls(): MediaControls? {
-        return this.getMediaRemote()?.controls
+        return this.getMediaRemote().controls
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         connectMediaRemote()
+        super.onCreate(savedInstanceState)
     }
 
     private fun connectMediaRemote() {

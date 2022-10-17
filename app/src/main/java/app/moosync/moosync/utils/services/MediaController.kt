@@ -33,9 +33,12 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
     var playerState: PlaybackState = PlaybackState.STOPPED
 
+    var repeat = false
+
     private val playbackManager: PlaybackManager
 
     private val mediaPlayerCallbacks: MutableList<MediaPlayerCallbacks> = mutableListOf()
+
 
     private fun handleQueueChange() {
         emitCallbackMethod(CallbackMethods.ON_QUEUE_CHANGE)
@@ -198,8 +201,16 @@ class MediaController(private val mContext: Context, private val foregroundServi
                 queue.previous()
             }
 
+            override fun seek(time: Int) {
+                playbackManager.songProgress = time
+            }
+
             override fun shuffleQueue() {
                 queue.shuffle()
+            }
+
+            override fun repeat() {
+                repeat = !repeat
             }
 
             override fun playSong(song: Song) {

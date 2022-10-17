@@ -19,3 +19,17 @@ fun List<Artist>.toArtistString(): String {
         it.name
     }
 }
+
+fun Int.toTimeString(): String {
+    val secs = this / 1000
+    val secsRem = secs % 60
+    val mins = secs.floorDiv(60)
+    val hrs = mins.floorDiv(60)
+
+    val secStr = "${if (secsRem < 10) "0" else ""}$secsRem"
+
+    if (hrs == 0) {
+        return "$mins:$secStr"
+    }
+    return "$hrs:$mins:$secStr"
+}
