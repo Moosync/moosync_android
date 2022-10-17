@@ -3,6 +3,7 @@ package app.moosync.moosync.ui.handlers
 import android.animation.ObjectAnimator
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.FrameLayout
 import androidx.core.animation.doOnEnd
 import app.moosync.moosync.MainActivity
@@ -23,6 +24,10 @@ import kotlin.math.abs
 
 class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val miniBarBinding: NowPlayingMiniBarBinding, private val bottomSheetBehavior: BottomSheetBehavior<FrameLayout>, private val bottomSheetPeekHandler: (peek: Boolean, animate: Boolean) -> Unit) {
 
+    private var circularSongsArray: Array<Song?> = arrayOf()
+    private var currentDisplayIndex: Int = 1
+
+
     fun setupMiniBar() {
         setMediaPlayerCallbacks()
         setupMiniPlayerSlideGestures {
@@ -39,6 +44,8 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
             if (song != null) {
                 setMiniBarPlayerDetails(song)
             }
+
+            this@MiniBarPlayerHandler.circularSongsArray = mainActivity.getMediaRemote().getCircularSongsAsync().await()
         }
     }
 
@@ -76,6 +83,11 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                 if (song != null) {
                     setMiniBarPlayerDetails(song)
                     bottomSheetPeekHandler(true, true)
+
+                    CoroutineScope(Dispatchers.Default).launch {
+                        this@MiniBarPlayerHandler.circularSongsArray = mainActivity.getMediaRemote().getCircularSongsAsync().await()
+                        currentDisplayIndex = 1
+                    }
                 }
             }
 
@@ -108,18 +120,11 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
     }
 
     private fun setupMiniPlayerSlideGestures(onEndCallback: () -> Unit) {
-        miniBarBinding.miniPlayerContainer.setOnTouchListener(object:
-            View.OnTouchListener {
-
+        miniBarBinding.miniPlayerContainer.setOnTouchListener(object: OnTouchListener {
             private var touchCoordinateX: Float = 0f
             private var touchCoordinateY: Float = 0f
 
-            private val SWIPE_VELOCITY_THRESHOLD_Y = 2000
-
             private var isDismissing = false
-
-            val width: Float
-                get() = miniBarBinding.miniPlayerContainer.width.toFloat()
 
             val height: Float
             get() = miniBarBinding.miniPlayerContainer.height.toFloat()
@@ -130,19 +135,6 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                 miniBarBinding.miniPlayerContainer.translationY = 0f
                 onEndCallback.invoke()
                 isDismissing = false
-            }
-
-            private fun dismissHorizontal(left: Boolean = false) {
-                isDismissing = true
-
-                val translateX = width + 30
-                ObjectAnimator.ofFloat(miniBarBinding.miniPlayerContainer, "translationX", if (left) -translateX else translateX).apply {
-                    duration = 100
-                    doOnEnd {
-                        onAnimationEnd()
-                    }
-                    start()
-                }
             }
 
             private fun dismissDown() {
@@ -197,6 +189,153 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                             animateToOriginalPos()
                         }
                     }
+                }
+
+                return true
+            }
+        })
+
+        miniBarBinding.textContainer.setOnTouchListener(object : OnTouchListener {
+            private var touchCoordinateX: Float = 0f
+            private var touchCoordinateY: Float = 0f
+
+            val width: Float
+                get() = miniBarBinding.textContainer.width.toFloat()
+
+            private fun animateToOriginalPos() {
+                ObjectAnimator.ofFloat(
+                    miniBarBinding.textContainer, "translationX", 0f).apply {
+                    duration = 100
+                    start()
+                }
+
+                ObjectAnimator.ofFloat(
+                    miniBarBinding.textContainer, "alpha", 1f).apply {
+                    duration = 100
+                    start()
+                }
+
+                onOtherSide = false
+            }
+
+            private var onOtherSide = false
+
+
+            private fun setSongDetails(index: Int) {
+                miniBarBinding.songTitle.text = circularSongsArray[index]?.title ?: ""
+                miniBarBinding.songSubtitle.text = circularSongsArray[index]?.artist?.toArtistString() ?: ""
+
+                currentDisplayIndex = index
+            }
+
+            private fun isNotSingleSongInQueue(): Boolean {
+                return circularSongsArray.filterNotNull().size > 1
+            }
+
+            private fun setNextSong() {
+                var nextIndex = currentDisplayIndex + 1
+                if (nextIndex >= circularSongsArray.filterNotNull().size) nextIndex = 0
+
+                setSongDetails(nextIndex)
+            }
+
+            private fun setPrevSong() {
+                var prevIndex = currentDisplayIndex - 1
+                if (prevIndex < 0) prevIndex = circularSongsArray.filterNotNull().size - 1
+
+                setSongDetails(prevIndex)
+            }
+
+
+            override fun onTouch(p0: View, p1: MotionEvent): Boolean {
+                if (p1.action == MotionEvent.ACTION_DOWN) {
+                    touchCoordinateX = p1.x
+                    touchCoordinateY = p1.y
+                }
+
+                if (p1.action == MotionEvent.ACTION_CANCEL) {
+                    animateToOriginalPos()
+                }
+
+                if (isNotSingleSongInQueue()) {
+                    if (p1.action == MotionEvent.ACTION_MOVE) {
+                        miniBarBinding.textContainer.translationX += p1.x - touchCoordinateX
+
+                        val swipeRightThreshold = width * 2/3
+                        val shiftOffsetSwipeRight = width / 3
+                        val touchCoordXOffsetSwipeRight = shiftOffsetSwipeRight + abs(miniBarBinding.textContainer.translationX)
+
+                        val swipeLeftThreshold = width / 3
+                        val shiftOffsetSwipeLeft = width
+                        val touchCoordXOffsetSwipeLeft = shiftOffsetSwipeLeft + abs(miniBarBinding.textContainer.translationX)
+
+                        if (!onOtherSide) {
+                            if (miniBarBinding.textContainer.translationX > 0) {
+                                miniBarBinding.textContainer.alpha = abs(1 - abs(miniBarBinding.textContainer.translationX / swipeRightThreshold))
+                            } else {
+                                miniBarBinding.textContainer.alpha = abs(1 - abs(miniBarBinding.textContainer.translationX / swipeLeftThreshold))
+                            }
+                        } else {
+                            if (miniBarBinding.textContainer.translationX <= 0) {
+                                miniBarBinding.textContainer.alpha = abs(1 - abs(miniBarBinding.textContainer.translationX / swipeLeftThreshold))
+                            } else {
+                                miniBarBinding.textContainer.alpha = abs(1 - abs(miniBarBinding.textContainer.translationX / shiftOffsetSwipeLeft))
+                            }
+                        }
+
+
+                        if (!onOtherSide) {
+                            if (miniBarBinding.textContainer.translationX > 0) {
+                                if (abs(miniBarBinding.textContainer.translationX) > swipeRightThreshold) {
+                                    setPrevSong()
+
+                                    touchCoordinateX += touchCoordXOffsetSwipeRight
+                                    miniBarBinding.textContainer.translationX = -shiftOffsetSwipeRight
+                                    onOtherSide = true
+                                }
+
+                            } else if (miniBarBinding.textContainer.translationX < 0) {
+                                if (abs(miniBarBinding.textContainer.translationX) > swipeLeftThreshold) {
+
+                                    setNextSong()
+
+                                    touchCoordinateX -= touchCoordXOffsetSwipeLeft
+                                    miniBarBinding.textContainer.translationX = shiftOffsetSwipeLeft
+                                    onOtherSide = true
+                                }
+                            }
+                        }
+
+                        if (onOtherSide) {
+                            if (miniBarBinding.textContainer.translationX < 0) {
+                                if (abs(miniBarBinding.textContainer.translationX) > shiftOffsetSwipeRight) {
+                                    onOtherSide = false
+                                }
+
+                            } else if (miniBarBinding.textContainer.translationX > 0) {
+                                if (abs(miniBarBinding.textContainer.translationX) > shiftOffsetSwipeLeft) {
+                                    onOtherSide = false
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (p1.action == MotionEvent.ACTION_UP) {
+                    animateToOriginalPos()
+
+                    if (p1.x == touchCoordinateX && p1.y == touchCoordinateY) {
+                        p0.performClick()
+                    }
+
+                    if (currentDisplayIndex != 1) {
+                        if (currentDisplayIndex > 1) {
+                            mainActivity.getMediaControls()?.next()
+                        } else {
+                            mainActivity.getMediaControls()?.previous()
+                        }
+                    }
+
                 }
 
                 return true

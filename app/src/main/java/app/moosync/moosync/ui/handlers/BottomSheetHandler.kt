@@ -22,7 +22,7 @@ class BottomSheetHandler(private val mainActivity: MainActivity, private val bot
 
     private fun initialBottomSheetSetup() {
         CoroutineScope(Dispatchers.Main).launch {
-            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
+            val song = mainActivity.getMediaRemote().getCurrentSongAsync(this).await()
             if (song != null) {
                 setBottomSheetPeek(peek = true, animate = true)
             } else {

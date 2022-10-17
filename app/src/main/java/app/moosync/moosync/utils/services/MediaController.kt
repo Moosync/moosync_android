@@ -39,15 +39,15 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
 
     private fun handleQueueChange() {
-        emitCallbackMethod(CallbackMethods.ON_QUEUE_CHANGE)
+        emitInAllCallbacks { it.onQueueChange() }
     }
 
     private fun handleTimeChange(time: Int) {
-        emitCallbackMethod(CallbackMethods.ON_TIME_CHANGE, time)
+        emitInAllCallbacks {it.onTimeChange(time)}
     }
 
     private fun handleSongChange(song: Song) {
-        emitCallbackMethod(CallbackMethods.ON_SONG_CHANGE, queue.currentSong)
+        emitInAllCallbacks { it.onSongChange(queue.currentSong) }
 
         mediaSessionHandler.updateMetadata(song)
         mediaSessionHandler.updatePlayerState(true)
@@ -79,15 +79,15 @@ class MediaController(private val mContext: Context, private val foregroundServi
             when (newState) {
                 PlaybackState.PLAYING -> {
                     playbackManager.play()
-                    emitCallbackMethod(CallbackMethods.ON_PLAY)
+                    emitInAllCallbacks() {it.onPlay()}
                 }
                 PlaybackState.PAUSED -> {
                     playbackManager.pause()
-                    emitCallbackMethod(CallbackMethods.ON_PAUSE)
+                    emitInAllCallbacks() {it.onPause()}
                 }
                 PlaybackState.STOPPED -> {
                     playbackManager.stop()
-                    emitCallbackMethod(CallbackMethods.ON_STOP)
+                    emitInAllCallbacks() {it.onStop()}
                 }
             }
             playerState = newState
@@ -105,7 +105,10 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
     private fun toggleRepeat() {
         queue.toggleRepeat()
-        emitCallbackMethod(CallbackMethods.ON_REPEAT_CHANGED, queue.repeat)
+        val repeat = queue.repeat
+        emitInAllCallbacks {
+            it.onRepeatChanged(repeat)
+        }
     }
 
     fun decideQuit(): Boolean {
@@ -117,17 +120,9 @@ class MediaController(private val mContext: Context, private val foregroundServi
         mediaPlayerCallbacks.add(callbacks)
     }
 
-    private fun emitCallbackMethod(method: CallbackMethods, vararg args: Any?) {
+    private fun emitInAllCallbacks(c: (callback: MediaPlayerCallbacks) -> Unit) {
         for (callback in this.mediaPlayerCallbacks) {
-            when (method) {
-                CallbackMethods.ON_PLAY -> callback.onPlay()
-                CallbackMethods.ON_PAUSE -> callback.onPause()
-                CallbackMethods.ON_STOP -> callback.onStop()
-                CallbackMethods.ON_SONG_CHANGE -> callback.onSongChange(args[0] as Song)
-                CallbackMethods.ON_QUEUE_CHANGE -> callback.onQueueChange()
-                CallbackMethods.ON_TIME_CHANGE -> callback.onTimeChange(args[0] as Int)
-                CallbackMethods.ON_REPEAT_CHANGED -> callback.onRepeatChanged(args[0] as Boolean)
-            }
+            c.invoke(callback)
         }
     }
 

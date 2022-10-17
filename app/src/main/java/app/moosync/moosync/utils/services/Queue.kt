@@ -11,7 +11,7 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
         }
 
     val currentSong: Song?
-        get() = if (currentSongIndex >= 0) queueSongItems[currentSongIndex] else null
+        get() = if (currentSongIndex >= 0 && currentSongIndex < queueSongItems.size) queueSongItems[currentSongIndex] else null
 
     private var _repeat = false
     val repeat: Boolean
@@ -61,6 +61,10 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
 
     fun toggleRepeat() {
         _repeat = !_repeat
+    }
+
+    fun getQueue(): ArrayList<Song> {
+        return queueSongItems
     }
 
     interface QueueCallbacks {

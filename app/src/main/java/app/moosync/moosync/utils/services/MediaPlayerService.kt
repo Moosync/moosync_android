@@ -125,6 +125,12 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
             override val currentSong: Song?
                 get() = this@MediaPlayerService.mediaController.queue.currentSong
 
+            override val currentIndex: Int
+                get() = this@MediaPlayerService.mediaController.queue.currentSongIndex
+
+            override val queue: ArrayList<Song>
+                get() = this@MediaPlayerService.mediaController.queue.getQueue()
+
             override val playbackState: PlaybackState
                 get() = this@MediaPlayerService.mediaController.playerState
 

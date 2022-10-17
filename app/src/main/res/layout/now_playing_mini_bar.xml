@@ -12,47 +12,34 @@
             app:cardElevation="0dp"
             app:themeStyle="secondary">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:orientation="vertical">
 
-                <app.moosync.moosync.ui.views.ThemedProgressBar
-                    android:id="@+id/seekbar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:progress="69" />
-
                 <app.moosync.moosync.ui.views.ThemedLinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/text_container"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toEndOf="@id/coverImage"
+                    app:layout_constraintEnd_toStartOf="@id/play_pause_button"
                     app:themeStyle="secondary">
 
-                    <ImageView
-                        android:id="@+id/coverImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_margin="8dp"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/cover_image"
-                        android:scaleType="centerCrop"
-                        tools:src="@tools:sample/avatars" />
-
                     <app.moosync.moosync.ui.views.ThemedLinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginVertical="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         app:themeStyle="secondary">
 
                         <app.moosync.moosync.ui.views.ThemedTextView
                             android:id="@+id/song_title"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textStyle="bold"
                             tools:text="@tools:sample/lorem[3]" />
@@ -60,49 +47,84 @@
                         <app.moosync.moosync.ui.views.ThemedTextView
                             android:id="@+id/song_subtitle"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             tools:text="@tools:sample/lorem[4]" />
 
                     </app.moosync.moosync.ui.views.ThemedLinearLayout>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/play_pause_button"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center"
-                        app:themeStyle="secondary"
-                        android:layout_marginEnd="8dp" >
+                </app.moosync.moosync.ui.views.ThemedLinearLayout>
 
-                        <ImageView
-                            android:id="@+id/play_button"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:contentDescription="@string/play"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:src="@drawable/ic_play" />
+                <app.moosync.moosync.ui.views.ThemedLinearLayout
+                    android:id="@+id/opaque_left_margin"
+                    android:layout_width="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:themeStyle="secondary"
+                    android:layout_height="match_parent" />
 
-                        <ImageView
-                            android:id="@+id/pause_button"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:contentDescription="@string/play"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:alpha="0"
-                            android:src="@drawable/ic_pause" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/coverImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/cover_image"
+                    app:layout_constraintStart_toEndOf="@id/opaque_left_margin"
+                    android:scaleType="centerCrop"
+                    tools:src="@tools:sample/avatars" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/play_pause_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    app:themeStyle="secondary"
+                    app:layout_constraintEnd_toStartOf="@id/shuffle_button"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginEnd="8dp" >
 
                     <ImageView
-                        android:id="@+id/shuffle_button"
+                        android:id="@+id/play_button"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="@string/shuffle"
-                        android:src="@drawable/ic_shuffle" />
-                </app.moosync.moosync.ui.views.ThemedLinearLayout>
-            </LinearLayout>
+                        android:contentDescription="@string/play"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_play" />
+
+                    <ImageView
+                        android:id="@+id/pause_button"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/play"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:alpha="0"
+                        android:src="@drawable/ic_pause" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <ImageView
+                    android:id="@+id/shuffle_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/shuffle"
+                    android:src="@drawable/ic_shuffle" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <app.moosync.moosync.ui.views.ThemedProgressBar
+                android:id="@+id/seekbar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:progress="69" />
         </app.moosync.moosync.ui.views.ThemedCardLayout>
 </layout>

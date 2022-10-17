@@ -158,6 +158,31 @@ class MediaServiceRemote private constructor(activity: Activity) {
         }
     }
 
+    private fun getValidSong(queue: ArrayList<Song>, index: Int, isNext: Boolean): Song? {
+        if (index < queue.size && index >= 0) {
+            return queue[index]
+        }
+
+        return if (queue.size <= 1 || (queue.size == 2 && isNext)) {
+            null
+        } else {
+            if (isNext) queue[0] else queue[queue.size - 1]
+        }
+    }
+
+    fun getCircularSongsAsync(): Deferred<Array<Song?>> {
+        return runOrAddToQueueAsync {
+            val nextIndex = it.currentIndex + 1
+            val prevIndex = it.currentIndex - 1
+
+            val currentSong = it.currentSong
+            var nextSong = getValidSong(it.queue, nextIndex, true)
+            val prevSong = getValidSong(it.queue, prevIndex, false)
+
+            return@runOrAddToQueueAsync arrayOf(prevSong, currentSong, nextSong)
+        }
+    }
+
     fun release() {
         mediaService?.decideQuit()
         if (mediaService != null) {

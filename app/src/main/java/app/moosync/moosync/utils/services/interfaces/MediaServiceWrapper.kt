@@ -6,6 +6,8 @@ import app.moosync.moosync.utils.models.Song
 interface MediaServiceWrapper {
     val controls: MediaControls
     val currentSong: Song?
+    val currentIndex: Int
+    val queue: ArrayList<Song>
     val playbackState: PlaybackState
     val repeat: Boolean
 
