@@ -1,7 +1,6 @@
 package app.moosync.moosync.ui.handlers
 
 import android.animation.ObjectAnimator
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
@@ -36,7 +35,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
 
     private fun miniBarInitialSetup() {
         CoroutineScope(Dispatchers.Main).launch {
-            val song = mainActivity.getMediaRemote()?.getCurrentSongAsync(this)?.await()
+            val song = mainActivity.getMediaRemote().getCurrentSongAsync(this).await()
             if (song != null) {
                 setMiniBarPlayerDetails(song)
             }
@@ -122,20 +121,8 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
             val width: Float
                 get() = miniBarBinding.miniPlayerContainer.width.toFloat()
 
-            val gestureDetector = GestureDetector(mainActivity, object : GestureDetector.SimpleOnGestureListener() {
-                override fun onFling(
-                    e1: MotionEvent,
-                    e2: MotionEvent,
-                    velocityX: Float,
-                    velocityY: Float
-                ): Boolean {
-                    if (abs(velocityY) > SWIPE_VELOCITY_THRESHOLD_Y) {
-                        dismissDown()
-                        return true
-                    }
-                    return false
-                }
-            })
+            val height: Float
+            get() = miniBarBinding.miniPlayerContainer.height.toFloat()
 
             private fun onAnimationEnd() {
                 bottomSheetPeekHandler(false, false)
@@ -145,7 +132,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                 isDismissing = false
             }
 
-            private fun dismiss(left: Boolean = false) {
+            private fun dismissHorizontal(left: Boolean = false) {
                 isDismissing = true
 
                 val translateX = width + 30
@@ -174,7 +161,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
 
             private fun animateToOriginalPos() {
                 ObjectAnimator.ofFloat(
-                    miniBarBinding.miniPlayerContainer, "translationX", 0f).apply {
+                    miniBarBinding.miniPlayerContainer, "translationY", 0f).apply {
                     duration = 100
                     start()
                 }
@@ -193,7 +180,8 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                     }
 
                     if (p1.action == MotionEvent.ACTION_MOVE) {
-                        miniBarBinding.miniPlayerContainer.translationX += p1.x - touchCoordinateX
+                        miniBarBinding.miniPlayerContainer.translationY =
+                            0f.coerceAtLeast(miniBarBinding.miniPlayerContainer.translationY + (p1.y - touchCoordinateY))
                     }
 
                     if (p1.action == MotionEvent.ACTION_UP) {
@@ -201,16 +189,14 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
                             p0?.performClick()
                         }
 
-                        val movement = miniBarBinding.miniPlayerContainer.translationX
+                        val movement = miniBarBinding.miniPlayerContainer.translationY
 
-                        if (abs(movement) > width / 4) {
-                            dismiss(movement <= 0)
+                        if (abs(movement) > (height * 2/3)) {
+                            dismissDown()
                         } else {
                             animateToOriginalPos()
                         }
                     }
-
-                    gestureDetector.onTouchEvent(p1)
                 }
 
                 return true
