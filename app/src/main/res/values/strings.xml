@@ -21,4 +21,5 @@
     <string name="repeat">Repeat</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip Forward</string>
+    <string name="zero_time">0:00</string>
 </resources>

@@ -44,6 +44,10 @@ class PlaybackManager(mContext: Context, private val playerListeners: PlayerList
         activePlayer.play()
     }
 
+    fun repeat() {
+        songProgress = 0
+    }
+
     private fun switchActivePlayer(newType: PlayerTypes) {
         if (activePlayerType != newType) {
             activePlayer.stop()

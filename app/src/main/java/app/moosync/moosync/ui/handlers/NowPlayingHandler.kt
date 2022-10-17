@@ -1,5 +1,6 @@
 package app.moosync.moosync.ui.handlers
 
+import android.graphics.PorterDuff
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import app.moosync.moosync.MainActivity
@@ -7,7 +8,8 @@ import app.moosync.moosync.R
 import app.moosync.moosync.databinding.NowPlayingLayoutBinding
 import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
-import app.moosync.moosync.ui.base.BaseFragment
+import app.moosync.moosync.utils.helpers.ColorStyles
+import app.moosync.moosync.utils.helpers.getColor
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.helpers.toTimeString
 import app.moosync.moosync.utils.models.Song
@@ -18,7 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NowPlayingHandler(private val mainActivity: MainActivity, private val nowPlayingLayoutBinding: NowPlayingLayoutBinding): BaseFragment() {
+class NowPlayingHandler(private val mainActivity: MainActivity, private val nowPlayingLayoutBinding: NowPlayingLayoutBinding) {
 
     private var isSeeking = false
 
@@ -85,7 +87,7 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
     }
 
     private fun setRepeat(repeat: Boolean) {
-        // TODO: Set repeat button
+        nowPlayingLayoutBinding.repeatButton.setColorFilter((if (repeat) ColorStyles.ACCENT else ColorStyles.TEXT_PRIMARY).getColor(), PorterDuff.Mode.SRC_IN)
     }
 
     private fun setNowPlayingDetails(currentSong: Song) {
@@ -98,7 +100,7 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
         }
 
         nowPlayingLayoutBinding.totalTime.text = currentSong.duration.toInt().toTimeString()
-        nowPlayingLayoutBinding.currentTime.text = "0:00"
+        nowPlayingLayoutBinding.currentTime.text = mainActivity.getString(R.string.zero_time)
 
         GlideApp
             .with(nowPlayingLayoutBinding.root.context)
@@ -130,6 +132,10 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
 
             override fun onPause() {
                 loadPlayPauseDrawable(true)
+            }
+
+            override fun onRepeatChanged(repeat: Boolean) {
+                setRepeat(repeat)
             }
         })
     }

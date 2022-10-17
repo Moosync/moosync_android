@@ -7,13 +7,15 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
      var currentSongIndex: Int = -1
         set(value) {
             field = value
-
-            Log.wtf("TAG", ": ${queueSongItems} $value")
             callbacks.onCurrentSongChange(queueSongItems[value])
         }
 
     val currentSong: Song?
         get() = if (currentSongIndex >= 0) queueSongItems[currentSongIndex] else null
+
+    private var _repeat = false
+    val repeat: Boolean
+    get() = _repeat
 
     fun playSong(song: Song) {
         currentSongIndex = addToQueue(song)
@@ -24,6 +26,17 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
         queueSongItems.add(song)
         callbacks.onQueueChange()
         return queueSongItems.size - 1
+    }
+
+    fun handleSongEnded() {
+        if (repeat) {
+            val song = currentSong
+            if (song != null) {
+                callbacks.onCurrentSongChange(song)
+            }
+        } else {
+            this.next()
+        }
     }
 
     fun next() {
@@ -44,6 +57,10 @@ class Queue(private val queueSongItems: ArrayList<Song> = arrayListOf(), private
 
     fun shuffle() {
         queueSongItems.shuffle()
+    }
+
+    fun toggleRepeat() {
+        _repeat = !_repeat
     }
 
     interface QueueCallbacks {

@@ -72,7 +72,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
     }
 
     private fun setMediaPlayerCallbacks() {
-        mainActivity.getMediaRemote()?.addMediaCallbacks(object: MediaPlayerCallbacks {
+        mainActivity.getMediaRemote().addMediaCallbacks(object: MediaPlayerCallbacks {
             override fun onSongChange(song: Song?) {
                 if (song != null) {
                     setMiniBarPlayerDetails(song)

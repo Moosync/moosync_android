@@ -3,6 +3,7 @@ package app.moosync.moosync.utils
 import android.app.Activity
 import android.content.*
 import android.os.IBinder
+import android.util.Log
 import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.MediaPlayerService
@@ -15,6 +16,7 @@ import kotlinx.coroutines.channels.consume
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.lang.reflect.UndeclaredThrowableException
 
 data class MethodRequirements(val scope: CoroutineScope?, val channel: Channel<Any?>?, val method: (mediaService: MediaServiceWrapper) -> Any?) {
     constructor(method: (mediaService: MediaServiceWrapper) -> Any?) : this(null, null, method)
@@ -180,12 +182,16 @@ class MediaServiceRemote private constructor(activity: Activity) {
     private class TransportControlInvocationHandler(private val addToQueueHandler: (method: (mediaService: MediaServiceWrapper) -> Unit) -> Unit) :
         InvocationHandler {
         override fun invoke(proxy: Any?, method: Method?, args: Array<out Any>?) {
-            addToQueueHandler {
-                if (args != null) {
-                    method?.invoke(it.controls, *args)
-                } else {
-                    method?.invoke(it.controls)
+            try {
+                addToQueueHandler {
+                    if (args != null) {
+                        method?.invoke(it.controls, *args)
+                    } else {
+                        method?.invoke(it.controls)
+                    }
                 }
+            } catch (e: UndeclaredThrowableException) {
+                Log.e("TransportControlInvocationHandler", "invoke: Failed to run method ${method?.name} $e", )
             }
         }
     }

@@ -9,4 +9,5 @@ interface MediaPlayerCallbacks {
     fun onSongChange(song: Song?) {}
     fun onQueueChange() {}
     fun onTimeChange(time: Int) {}
+    fun onRepeatChanged(repeat: Boolean) {}
 }

@@ -129,7 +129,7 @@ class MediaPlayerService : MediaBrowserServiceCompat() {
                 get() = this@MediaPlayerService.mediaController.playerState
 
             override val repeat: Boolean
-                get() = this@MediaPlayerService.mediaController.repeat
+                get() = this@MediaPlayerService.mediaController.queue.repeat
 
             override fun decideQuit() {
                 this@MediaPlayerService.decideQuit()

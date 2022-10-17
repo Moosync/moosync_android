@@ -33,8 +33,6 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
     var playerState: PlaybackState = PlaybackState.STOPPED
 
-    var repeat = false
-
     private val playbackManager: PlaybackManager
 
     private val mediaPlayerCallbacks: MutableList<MediaPlayerCallbacks> = mutableListOf()
@@ -105,6 +103,11 @@ class MediaController(private val mContext: Context, private val foregroundServi
         notificationManager.updateMetadata()
     }
 
+    private fun toggleRepeat() {
+        queue.toggleRepeat()
+        emitCallbackMethod(CallbackMethods.ON_REPEAT_CHANGED, queue.repeat)
+    }
+
     fun decideQuit(): Boolean {
         return !playbackManager.isPlaying
     }
@@ -123,6 +126,7 @@ class MediaController(private val mContext: Context, private val foregroundServi
                 CallbackMethods.ON_SONG_CHANGE -> callback.onSongChange(args[0] as Song)
                 CallbackMethods.ON_QUEUE_CHANGE -> callback.onQueueChange()
                 CallbackMethods.ON_TIME_CHANGE -> callback.onTimeChange(args[0] as Int)
+                CallbackMethods.ON_REPEAT_CHANGED -> callback.onRepeatChanged(args[0] as Boolean)
             }
         }
     }
@@ -158,7 +162,7 @@ class MediaController(private val mContext: Context, private val foregroundServi
 
         playbackManager = PlaybackManager(mContext, object : PlayerListeners {
             override fun onSongEnded() {
-                queue.next()
+                queue.handleSongEnded()
             }
 
             override fun onTimeChange(time: Int) {
@@ -210,7 +214,7 @@ class MediaController(private val mContext: Context, private val foregroundServi
             }
 
             override fun repeat() {
-                repeat = !repeat
+                toggleRepeat()
             }
 
             override fun playSong(song: Song) {
@@ -243,6 +247,6 @@ class MediaController(private val mContext: Context, private val foregroundServi
     }
 
     private enum class CallbackMethods {
-        ON_PLAY, ON_PAUSE, ON_STOP, ON_SONG_CHANGE, ON_QUEUE_CHANGE, ON_TIME_CHANGE
+        ON_PLAY, ON_PAUSE, ON_STOP, ON_SONG_CHANGE, ON_QUEUE_CHANGE, ON_TIME_CHANGE, ON_REPEAT_CHANGED
     }
 }
