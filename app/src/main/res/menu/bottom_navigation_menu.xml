@@ -3,7 +3,7 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_songs"
+            android:id="@+id/songsListFragment"
             android:icon="@drawable/ic_home"
             android:checked="true"
             android:title="@string/home" />
@@ -14,7 +14,7 @@
             android:title="@string/explore" />
 
         <item
-            android:id="@+id/nav_playlists"
+            android:id="@+id/playlistsFragment"
             android:icon="@drawable/ic_playlists"
             android:title="@string/playlists" />
 

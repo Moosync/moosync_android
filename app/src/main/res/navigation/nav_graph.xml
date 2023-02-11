@@ -3,11 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/songsList">
+    app:startDestination="@id/songsListFragment">
 
     <fragment
-        android:id="@+id/songsList"
+        android:id="@+id/songsListFragment"
         android:name="app.moosync.moosync.ui.pages.songs.SongsList"
-        android:label="fragment_songs_list"
-        tools:layout="@layout/fragment_songs_list" />
+        android:label="Songs"
+        tools:layout="@layout/fragment_songs_list" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="app.moosync.moosync.ui.pages.playlists.PlaylistsFragment"
+        android:label="Playlists"
+        tools:layout="@layout/fragment_playlists" />
 </navigation>

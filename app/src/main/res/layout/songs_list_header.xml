@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<app.moosync.moosync.ui.views.ThemedLinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/songsListText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:paddingHorizontal="24dp"
-    android:paddingVertical="16dp">
-
-    <app.moosync.moosync.ui.views.ThemedTextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:text="@string/songs_header" />
-
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <app.moosync.moosync.ui.views.ThemedLinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp">
 
-        <ImageButton
-            android:layout_width="wrap_content"
+        <app.moosync.moosync.ui.views.ThemedTextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/add_queue" />
+            android:layout_weight="1"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="@string/songs_header" />
 
-        <ImageButton
+        <app.moosync.moosync.ui.views.ThemedLinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:background="@drawable/list_sort" />
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/add_queue" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/list_sort" />
+        </app.moosync.moosync.ui.views.ThemedLinearLayout>
     </app.moosync.moosync.ui.views.ThemedLinearLayout>
-</app.moosync.moosync.ui.views.ThemedLinearLayout>
+
+</layout>
