@@ -18,6 +18,8 @@ class PlaylistsFragment: BaseFragment() {
         val binding: FragmentSongsListBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_songs_list, container, false)
 
+        setToolbar(binding.root)
+
         return binding.root
     }
 }

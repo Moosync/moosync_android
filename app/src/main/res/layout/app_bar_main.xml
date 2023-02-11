@@ -16,11 +16,6 @@
             android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent">
 
-            <include layout="@layout/app_header" />
-            <include
-                android:id="@+id/songs_list_header"
-                layout="@layout/songs_list_header"
-            />
         </app.moosync.moosync.ui.views.ThemedLinearLayout>
 
         <androidx.fragment.app.FragmentContainerView

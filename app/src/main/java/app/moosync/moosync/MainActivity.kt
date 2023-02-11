@@ -3,8 +3,6 @@ package app.moosync.moosync
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import app.moosync.moosync.databinding.ActivityMainBinding
@@ -43,10 +41,6 @@ class MainActivity : BaseMainActivity() {
         val navController =
             (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
         binding.themedBottomNavigationView.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
-            binding.appBarMain.songsListHeader.title.text = navDestination.label
-        }
     }
 
     private fun setupOverlayPlayers() {

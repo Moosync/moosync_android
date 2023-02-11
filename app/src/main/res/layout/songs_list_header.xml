@@ -9,7 +9,7 @@
         android:paddingVertical="16dp">
 
         <app.moosync.moosync.ui.views.ThemedTextView
-            android:id="@+id/title"
+            android:id="@+id/song_list_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

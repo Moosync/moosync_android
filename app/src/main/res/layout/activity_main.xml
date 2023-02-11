@@ -3,32 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/drawer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-        
-        <include
-            android:id="@+id/app_bar_main"
-            layout="@layout/app_bar_main"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
 
-        <include
-            android:id="@+id/bottom_sheet"
-            layout="@layout/bottom_sheet_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <include
+                android:id="@+id/app_bar_main"
+                layout="@layout/app_bar_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <app.moosync.moosync.ui.views.ThemedBottomNavigationView
-            android:id="@+id/themedBottomNavigationView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:itemRippleColor="@color/transparent"
-            app:labelVisibilityMode="labeled"
-            app:layout_constraintBottom_toBottomOf="@+id/app_bar_main"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/bottom_navigation_menu" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <include
+                android:id="@+id/bottom_sheet"
+                layout="@layout/bottom_sheet_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <app.moosync.moosync.ui.views.ThemedBottomNavigationView
+                android:id="@+id/themedBottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemRippleColor="@color/transparent"
+                app:labelVisibilityMode="labeled"
+                app:layout_constraintBottom_toBottomOf="@+id/app_bar_main"
+                app:layout_constraintStart_toStartOf="parent"
+                app:menu="@menu/bottom_navigation_menu" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -34,6 +34,8 @@ class SongsList : BaseFragment() {
         }
         binding.songsList.adapter = adapter
 
+        setToolbar(binding.root)
+
         viewModel.getSongList().observe(viewLifecycleOwner) {
             val tmp = ArrayList(it)
             tmp.add(0, Song.emptySong)
