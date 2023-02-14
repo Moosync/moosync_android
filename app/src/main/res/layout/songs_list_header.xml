@@ -18,19 +18,11 @@
             android:text="@string/songs_header" />
 
         <app.moosync.moosync.ui.views.ThemedLinearLayout
+            android:id="@+id/song_list_header_button_group"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/add_queue" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:background="@drawable/list_sort" />
         </app.moosync.moosync.ui.views.ThemedLinearLayout>
     </app.moosync.moosync.ui.views.ThemedLinearLayout>
 

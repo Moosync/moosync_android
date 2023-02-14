@@ -2,7 +2,7 @@ package app.moosync.moosync.ui.views
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.LinearLayoutCompat
+import android.widget.LinearLayout
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.helpers.ColorStyles
@@ -12,7 +12,7 @@ import app.moosync.moosync.utils.helpers.observe
 
 
 class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
-    LinearLayoutCompat(context, attrs) {
+    LinearLayout(context, attrs) {
 
     private val colorStyle: ColorStyles
 

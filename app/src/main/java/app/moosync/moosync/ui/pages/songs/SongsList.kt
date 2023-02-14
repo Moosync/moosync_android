@@ -10,6 +10,7 @@ import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.SongItemAdapter
 import app.moosync.moosync.ui.base.BaseFragment
+import app.moosync.moosync.ui.base.HeaderButtons
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.viewModels.SongsViewModel
@@ -23,6 +24,10 @@ class SongsList : BaseFragment() {
 
         val binding: FragmentSongsListBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_songs_list, container, false)
+        rootView = binding.root
+
+        setHeaderButtons(HeaderButtons("Add to queue", R.drawable.add_queue), HeaderButtons("Sort by", R.drawable.list_sort))
+
         val viewModel: SongsViewModel by activityViewModels()
 
         val adapter = SongItemAdapter {
@@ -43,6 +48,6 @@ class SongsList : BaseFragment() {
             adapter.submitList(tmp)
         }
 
-        return binding.root
+        return rootView
     }
 }

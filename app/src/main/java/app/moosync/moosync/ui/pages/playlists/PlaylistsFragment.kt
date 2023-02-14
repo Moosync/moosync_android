@@ -11,6 +11,7 @@ import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.PlaylistItemAdapter
 import app.moosync.moosync.ui.base.BaseFragment
+import app.moosync.moosync.ui.base.HeaderButtons
 import app.moosync.moosync.utils.viewModels.PlaylistsViewModel
 
 class PlaylistsFragment: BaseFragment() {
@@ -21,12 +22,13 @@ class PlaylistsFragment: BaseFragment() {
     ): View {
         val binding: FragmentSongsListBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_songs_list, container, false)
+        rootView = binding.root
+
+        setHeaderButtons(HeaderButtons("New Playlist", R.drawable.material_symbols_add_rounded))
 
         setToolbar(binding.root)
 
         val viewModel: PlaylistsViewModel by activityViewModels()
-
-
 
         val adapter = PlaylistItemAdapter {
             Log.d(TAG, "onCreateView: clicked ${it.name}")
@@ -39,6 +41,6 @@ class PlaylistsFragment: BaseFragment() {
             adapter.submitList(tmp)
         }
 
-        return binding.root
+        return rootView
     }
 }
