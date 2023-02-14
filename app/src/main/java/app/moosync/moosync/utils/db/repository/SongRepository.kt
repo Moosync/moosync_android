@@ -3,7 +3,11 @@ package app.moosync.moosync.utils.db.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Transaction
-import app.moosync.moosync.utils.db.*
+import app.moosync.moosync.utils.db.PlaylistEntity
+import app.moosync.moosync.utils.db.RoomSongItem
+import app.moosync.moosync.utils.db.SongAndArtistEntity
+import app.moosync.moosync.utils.db.SongAndGenreEntity
+import app.moosync.moosync.utils.db.SongDatabase
 
 class SongRepository(mContext: Context) {
     private val database = SongDatabase(context = mContext)
@@ -13,6 +17,7 @@ class SongRepository(mContext: Context) {
     private val artistDao = database.artistDao()
     private val genreDao = database.genreDao()
     private val albumDao = database.albumDao()
+    private val playlistDao = database.playlistDao()
 
     @Transaction
     fun insert(vararg roomSongItems: RoomSongItem) {
@@ -41,6 +46,10 @@ class SongRepository(mContext: Context) {
 
     fun fetchAllSongs(): LiveData<List<RoomSongItem>> {
         return songDao.getAllSongs()
+    }
+
+    fun fetchAllPlaylists(): LiveData<List<PlaylistEntity>> {
+        return playlistDao.getAllPlaylists()
     }
 
     fun fetchSongById(id: Long): RoomSongItem {

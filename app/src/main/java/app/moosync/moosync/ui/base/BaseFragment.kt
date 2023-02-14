@@ -11,6 +11,10 @@ import app.moosync.moosync.utils.MediaServiceRemote
 import app.moosync.moosync.utils.services.interfaces.MediaControls
 
 abstract class BaseFragment: Fragment() {
+
+    protected val TAG: String
+        get() = javaClass.kotlin.simpleName ?: javaClass.kotlin.toString()
+
     fun getMediaRemote(): MediaServiceRemote? {
         val activity = requireActivity()
         if (activity is MainActivity) {

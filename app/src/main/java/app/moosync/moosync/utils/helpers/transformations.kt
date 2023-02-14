@@ -1,7 +1,9 @@
 package app.moosync.moosync.utils.helpers
 
+import app.moosync.moosync.utils.db.PlaylistEntity
 import app.moosync.moosync.utils.db.RoomSongItem
 import app.moosync.moosync.utils.models.Artist
+import app.moosync.moosync.utils.models.Playlist
 import app.moosync.moosync.utils.models.Song
 
 fun List<RoomSongItem>.toSongs(): List<Song> {
@@ -17,6 +19,12 @@ fun RoomSongItem.toSong(): Song {
 fun List<Artist>.toArtistString(): String {
     return joinToString(", ") {
         it.name
+    }
+}
+
+fun List<PlaylistEntity>.toPlaylists(): List<Playlist> {
+    return map {
+        Playlist.fromDatabaseEntity(it)
     }
 }
 

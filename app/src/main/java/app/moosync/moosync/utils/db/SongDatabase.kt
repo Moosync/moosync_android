@@ -7,12 +7,13 @@ import androidx.room.RoomDatabase
 import app.moosync.moosync.BuildConfig
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [
         SongEntity::class,
         ArtistEntity::class,
         AlbumEntity::class,
         GenreEntity::class,
+        PlaylistEntity::class,
         SongAndGenreEntity::class,
         SongAndArtistEntity::class,
     ]
@@ -25,6 +26,7 @@ abstract class SongDatabase : RoomDatabase() {
     abstract fun artistDao(): ArtistDao
     abstract fun genreDao(): GenreDao
     abstract fun albumDao(): AlbumDao
+    abstract fun playlistDao(): PlaylistDao
 
     companion object {
         private lateinit var INSTANCE: SongDatabase
