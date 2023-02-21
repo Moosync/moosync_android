@@ -8,6 +8,7 @@ import app.moosync.moosync.utils.db.RoomSongItem
 import app.moosync.moosync.utils.db.SongAndArtistEntity
 import app.moosync.moosync.utils.db.SongAndGenreEntity
 import app.moosync.moosync.utils.db.SongDatabase
+import app.moosync.moosync.utils.models.Playlist
 
 class SongRepository(mContext: Context) {
     private val database = SongDatabase(context = mContext)
@@ -50,6 +51,10 @@ class SongRepository(mContext: Context) {
 
     fun fetchAllPlaylists(): LiveData<List<PlaylistEntity>> {
         return playlistDao.getAllPlaylists()
+    }
+
+    fun insertPlaylist(playlist: Playlist) {
+        playlistDao.insert(playlist.toDatabaseEntity())
     }
 
     fun fetchSongById(id: Long): RoomSongItem {

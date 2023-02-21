@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.PlaylistItemAdapter
@@ -24,7 +25,9 @@ class PlaylistsFragment: BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_songs_list, container, false)
         rootView = binding.root
 
-        setHeaderButtons(HeaderButtons("New Playlist", R.drawable.material_symbols_add_rounded))
+        setHeaderButtons(HeaderButtons("New Playlist", R.drawable.material_symbols_add_rounded) {
+            NewPlaylistDialog(requireContext()).show()
+        })
 
         setToolbar(binding.root)
 
@@ -34,6 +37,7 @@ class PlaylistsFragment: BaseFragment() {
             Log.d(TAG, "onCreateView: clicked ${it.name}")
         }
 
+        binding.songsList.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.songsList.adapter = adapter
 
         viewModel.getSongList().observe(viewLifecycleOwner) {

@@ -1,5 +1,6 @@
 package app.moosync.moosync.ui.adapters
 
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DiffUtil
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.PlaylistListItemBinding
@@ -8,7 +9,7 @@ import app.moosync.moosync.utils.models.Playlist
 class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : BaseListAdapter<PlaylistListItemBinding, Playlist>(SongDiffCallback) {
 
     override val layoutId: Int
-        get() = R.layout.song_list_item
+        get() = R.layout.playlist_list_item
 
     object SongDiffCallback : DiffUtil.ItemCallback<Playlist>() {
         override fun areItemsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
@@ -22,6 +23,7 @@ class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : B
 
     override fun bind(binding: PlaylistListItemBinding, item: Playlist) {
         binding.title.text = item.name
+        binding.coverImage.setImageDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.ic_playlists))
 
 //        GlideApp
 //            .with(binding.root.context)
