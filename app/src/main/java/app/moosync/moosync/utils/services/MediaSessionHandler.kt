@@ -9,9 +9,9 @@ import android.graphics.drawable.Drawable
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import app.moosync.moosync.BuildConfig
 import app.moosync.moosync.R
-import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
@@ -83,6 +83,7 @@ class MediaSessionHandler(private val mContext: Context) {
 
     fun updateMetadata(song: Song) {
         if (song != Song.emptySong) {
+            Log.d("TAG", "updateMetadata: ${song.duration}")
             val builder = MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
                 .putString(
@@ -95,7 +96,7 @@ class MediaSessionHandler(private val mContext: Context) {
 
             GlideApp.with(mContext)
                 .asBitmap()
-                .load(AudioCover(song._id))
+                .load(song.coverImage)
                 .signature(MediaStoreSignature("", song.modified, 0))
                 .into(object : CustomTarget<Bitmap>(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL) {
                     override fun onResourceReady(

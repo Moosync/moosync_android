@@ -1,12 +1,12 @@
 package app.moosync.moosync.ui.handlers
 
 import android.graphics.PorterDuff
+import android.util.Log
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.NowPlayingLayoutBinding
-import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.ColorStyles
 import app.moosync.moosync.utils.helpers.getColor
@@ -104,7 +104,7 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
 
         GlideApp
             .with(nowPlayingLayoutBinding.root.context)
-            .load(AudioCover(currentSong._id))
+            .load(currentSong.coverImage)
             .placeholder(R.drawable.songs)
             .transform(RoundedCorners(24))
             .signature(MediaStoreSignature("", currentSong.modified, 0))
@@ -120,6 +120,7 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
             }
 
             override fun onTimeChange(time: Int) {
+                Log.d("TAG", "onTimeChange: $time")
                 if (!isSeeking) {
                     nowPlayingLayoutBinding.seekbar.progress = time
                     nowPlayingLayoutBinding.currentTime.text = time.toTimeString()

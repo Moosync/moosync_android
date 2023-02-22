@@ -3,7 +3,6 @@ package app.moosync.moosync.ui.adapters
 import androidx.recyclerview.widget.DiffUtil
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.SongListItemBinding
-import app.moosync.moosync.glide.AudioCover
 import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
@@ -32,7 +31,7 @@ class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapt
 
         GlideApp
             .with(binding.root.context)
-            .load(AudioCover(item._id))
+            .load(item.coverImage)
             .placeholder(R.drawable.songs)
             .transform(CenterCrop(), RoundedCorners(16))
             .signature(MediaStoreSignature("", item.modified, 0))

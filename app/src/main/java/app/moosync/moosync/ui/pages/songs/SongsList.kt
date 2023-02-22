@@ -44,7 +44,7 @@ class SongsList : BaseFragment() {
         viewModel.getSongList().observe(viewLifecycleOwner) {
             val tmp = ArrayList(it)
             tmp.add(0, Song.emptySong)
-            tmp.add(1, Song(69, "youtube", 90, null, null, null, 0, "gHzuabZUd6c", PlayerTypes.YOUTUBE))
+            tmp.add(1, Song("youtube:gHzuabZUd6c", "youtube", 90, null, null, null, 0, "gHzuabZUd6c", null, PlayerTypes.YOUTUBE))
             adapter.submitList(tmp)
         }
 

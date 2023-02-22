@@ -9,7 +9,7 @@ class ArtistEntity(
 
     @PrimaryKey
     @ColumnInfo("artist_id")
-    val _id: Long,
+    val _id: String,
 
     @ColumnInfo("name")
     val name: String

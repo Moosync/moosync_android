@@ -7,13 +7,13 @@ import app.moosync.moosync.utils.PlayerTypes
 class SongEntity(
     @PrimaryKey
     @ColumnInfo("song_id")
-    val _id: Long,
+    val _id: String,
 
     @ColumnInfo("title")
     val title: String,
 
     @ColumnInfo("album_id")
-    val albumId: Long?,
+    val albumId: String?,
 
     @ColumnInfo("duration")
     val duration: Long,
@@ -24,20 +24,23 @@ class SongEntity(
     @ColumnInfo("playback_url")
     val playbackUrl: String?,
 
+    @ColumnInfo("coverImage")
+    val coverImage: String?,
+
     @ColumnInfo("type")
     val type: PlayerTypes
 )
 
 @Entity(primaryKeys = ["song_id", "artist_id"])
 data class SongAndArtistEntity (
-    val song_id: Long,
-    val artist_id: Long
+    val song_id: String,
+    val artist_id: String
 )
 
 @Entity(primaryKeys = ["song_id", "genre_id"])
 data class SongAndGenreEntity (
-    val song_id: Long,
-    val genre_id: Long
+    val song_id: String,
+    val genre_id: String
 )
 
 data class RoomSongItem(

@@ -1,6 +1,7 @@
 package app.moosync.moosync.utils.services.players
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import app.moosync.moosync.utils.PlaybackState
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -18,7 +19,6 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
     private var isLoadingVideo = false
     private val playerStateActionQueue = arrayListOf<PlaybackState>()
 
-
     init {
         _playerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
             override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
@@ -28,34 +28,39 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
         })
     }
 
-    private var _progress = 0
+    private var _progress = 0f
     override var progress: Int
-        get() = _progress
+        get() = (_progress * 1000).toInt()
         set(value) {
-            playerInstance?.seekTo(value.toFloat())
+            playerInstance?.seekTo(value.toFloat() / 1000)
+            _progress = value.toFloat() / 1000
         }
-
 
     private var _isPlaying: Boolean = false
     override val isPlaying: Boolean
         get() = _isPlaying
 
-
-    private fun isVideoId(videoId: Any): String? {
-        if (videoId is String && videoId.length == 11) return videoId
-        return null
+    private fun isVideoId(videoId: Any): Boolean {
+        if (videoId is String && videoId.length == 11) return true
+        return false
     }
 
     override fun canPlayData(data: Any): Boolean {
         return isVideoId(data) != null
     }
 
+    private fun getVideoIdFromURL(url: String): String? {
+        return Uri.parse(url).getQueryParameter("v")
+    }
+
     override fun load(mContext: Context, data: Any, autoPlay: Boolean) {
-        val videoId = isVideoId(data)
-        if (isInitialized && videoId != null) {
-            playerInstance!!.cueVideo(videoId, 0F)
-            isLoadingVideo = true
-            shouldPlayOnVideoLoad = autoPlay
+        if (data is String) {
+            val videoId = if (isVideoId(data)) data else getVideoIdFromURL(data)
+            if (isInitialized && videoId != null) {
+                playerInstance!!.cueVideo(videoId, 0F)
+                isLoadingVideo = true
+                shouldPlayOnVideoLoad = autoPlay
+            }
         }
     }
 
@@ -131,8 +136,8 @@ class YoutubePlayer(mContext: Context) : GenericPlayer() {
         override fun onApiChange(youTubePlayer: YouTubePlayer) {}
 
         override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-            _progress = second.toInt()
-            playerListeners.onTimeChange(second.toInt())
+            _progress = second
+            playerListeners.onTimeChange((second * 1000).toInt())
         }
 
         override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {}

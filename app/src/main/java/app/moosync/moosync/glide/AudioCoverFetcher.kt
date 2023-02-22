@@ -19,7 +19,12 @@ import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
 import org.jaudiotagger.audio.mp3.MP3File
 import org.jaudiotagger.tag.images.Artwork
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
 
 
 internal class AudioCoverLoader(private val mContext: Context) :
@@ -49,7 +54,7 @@ internal class AudioCoverLoader(private val mContext: Context) :
     }
 
     override fun handles(model: AudioCover): Boolean {
-        return model.id != -1L
+        return model.id.isNotEmpty()
     }
 }
 
@@ -60,7 +65,7 @@ internal class AudioCoverFetcher(
     private val width: Int
 ) : DataFetcher<InputStream> {
     private var stream: FileInputStream? = null
-    private val id: Long
+    private val id: String
         get() = model.id
 
     private fun fallback(uri: Uri): InputStream? {
@@ -118,7 +123,7 @@ internal class AudioCoverFetcher(
     private fun getCoverImg(priority: Priority): InputStream? {
 
         val uri =
-            ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+            ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

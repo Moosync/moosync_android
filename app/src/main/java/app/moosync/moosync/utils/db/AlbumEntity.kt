@@ -9,7 +9,7 @@ class AlbumEntity(
 
     @PrimaryKey
     @ColumnInfo("album_id")
-    val _id: Long,
+    val _id: String,
 
     @ColumnInfo("name")
     val name: String

@@ -34,6 +34,9 @@ class MainActivity : BaseMainActivity() {
                 val repo = SongRepository(this@MainActivity)
                 repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())
 
+//                val ytSongs = YoutubeProvider().search("hello").await()
+//                repo.insert(*ytSongs.map { it.toDatabaseEntity() }.toTypedArray())
+
                 Log.d("TAG", "onCreate: added songs")
             }
         }
