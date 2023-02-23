@@ -13,6 +13,7 @@ import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -60,6 +61,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
 
     private fun setMiniBarPlayerDetails(currentSong: Song) {
         miniBarBinding.songTitle.text = currentSong.title
+        miniBarBinding.songTitle.isSelected = true
         miniBarBinding.songSubtitle.text = currentSong.artist?.toArtistString() ?: ""
         with(miniBarBinding.seekbar) {
             max = currentSong.duration.toInt()
@@ -71,7 +73,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
             .with(miniBarBinding.root.context)
             .load(currentSong.coverImage)
             .placeholder(R.drawable.songs)
-            .transform(RoundedCorners(16))
+            .transform(CenterCrop(), RoundedCorners(16))
             .signature(MediaStoreSignature("", currentSong.modified, 0))
             .into(miniBarBinding.coverImage)
     }

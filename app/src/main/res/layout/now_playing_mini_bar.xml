@@ -41,6 +41,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            android:maxLines="1"
                             android:textStyle="bold"
                             tools:text="@tools:sample/lorem[3]" />
 
@@ -49,6 +53,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:maxLines="1"
                             tools:text="@tools:sample/lorem[4]" />
 
                     </app.moosync.moosync.ui.views.ThemedLinearLayout>
@@ -64,13 +69,14 @@
 
                 <ImageView
                     android:id="@+id/coverImage"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginVertical="8dp"
                     android:layout_marginEnd="8dp"
                     android:adjustViewBounds="true"
                     android:contentDescription="@string/cover_image"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@id/opaque_left_margin"
                     android:scaleType="centerCrop"
                     tools:src="@tools:sample/avatars" />
