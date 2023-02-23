@@ -1,8 +1,8 @@
 package app.moosync.moosync.providers
 
-import android.util.Log
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Artist
+import app.moosync.moosync.utils.models.Playlist
 import app.moosync.moosync.utils.models.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -50,6 +50,8 @@ class YoutubeProvider : GenericProvider() {
         return streamingService.channelLHFactory.getId(url)
     }
 
+
+
     override fun search(term: String): Deferred<ArrayList<Song>> {
         return CoroutineScope(Dispatchers.Default).async {
             val arrayList = ArrayList<Song>()
@@ -74,10 +76,15 @@ class YoutubeProvider : GenericProvider() {
                         )
                     )
                 }
-                Log.d("TAG", "search: ${infoItem}")
             }
 
             arrayList
+        }
+    }
+
+    override fun getUserPlaylists(): Deferred<ArrayList<Playlist>> {
+        return CoroutineScope(Dispatchers.Default).async {
+            ArrayList()
         }
     }
 }

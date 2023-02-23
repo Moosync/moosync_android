@@ -1,6 +1,7 @@
 package app.moosync.moosync.ui.views
 
 import android.content.Context
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -15,6 +16,7 @@ class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
     LinearLayout(context, attrs) {
 
     private val colorStyle: ColorStyles
+    private val paint = Paint()
 
     init {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.ThemedLinearLayout)
@@ -22,6 +24,7 @@ class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
             attributes.getColorStyle(R.styleable.ThemedLinearLayout_themeStyle, ColorStyles.PRIMARY)
         setCustomColor(colorStyle)
         attributes.recycle()
+
     }
 
     private fun setCustomColor(colorStyle: ColorStyles) {

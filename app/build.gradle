@@ -73,4 +73,5 @@ dependencies {
     implementation 'com.github.TeamNewPipe.NewPipeExtractor:NewPipeExtractor:7e793c11ae'
 
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.android.material:material:1.9.0-alpha02'
 }

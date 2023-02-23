@@ -27,6 +27,11 @@ data class Song(
     val type: PlayerTypes
 ): Serializable {
 
+    override fun equals(other: Any?): Boolean {
+        if (other is Song) return other._id === this._id
+        return super.equals(other)
+    }
+
     private fun serializeCoverImage(): String? {
         if (coverImage != null) {
             val prefix = coverImage::class.java.name
