@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import app.moosync.moosync.databinding.ActivityMainBinding
+import app.moosync.moosync.providers.YoutubeProvider
 import app.moosync.moosync.ui.base.BaseMainActivity
 import app.moosync.moosync.ui.handlers.BottomSheetHandler
 import app.moosync.moosync.ui.handlers.MiniBarPlayerHandler
@@ -34,8 +35,8 @@ class MainActivity : BaseMainActivity() {
                 val repo = SongRepository(this@MainActivity)
                 repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())
 
-//                val ytSongs = YoutubeProvider().search("hello").await()
-//                repo.insert(*ytSongs.map { it.toDatabaseEntity() }.toTypedArray())
+                val ytSongs = YoutubeProvider().search("Bury the light").await()
+                repo.insert(*ytSongs.map { it.toDatabaseEntity() }.toTypedArray())
 
                 Log.d("TAG", "onCreate: added songs")
             }

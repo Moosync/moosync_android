@@ -32,7 +32,7 @@
                 app:contentInsetLeft="0dp"
                 app:contentInsetStart="0dp"
 
-            android:title=" "
+                android:title=" "
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.01"
                 app:layout_scrollFlags="scroll|enterAlwaysCollapsed">

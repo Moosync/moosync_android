@@ -66,7 +66,7 @@ class YoutubeProvider : GenericProvider() {
                             "youtube:${getVideoIdFromURL(infoItem.url)}",
                             infoItem.name,
                             infoItem.duration * 1000,
-                            listOf(Artist("youtube-author:${getChannelIdFromURL(infoItem.uploaderUrl)}", infoItem.name)),
+                            listOf(Artist("youtube-author:${getChannelIdFromURL(infoItem.uploaderUrl)}", infoItem.uploaderName)),
                             null,
                             null,
                             System.currentTimeMillis(),
