@@ -15,7 +15,8 @@ enum class ColorStyles(val value: Int) {
     TEXT_PRIMARY(4),
     TEXT_SECONDARY(5),
     TEXT_INVERSE(6),
-    DIVIDER(7);
+    DIVIDER(7),
+    TRANSPARENT(8);
 
     companion object {
         fun fromInt(value: Int) = values().first { it.value == value }
@@ -31,6 +32,7 @@ object ThemeHelper {
     private val textSecondary = MutableLiveData((0xFF565656).toInt())
     private val textInverse = MutableLiveData((0xFF000000).toInt())
     private val divider = MutableLiveData((0xFFA0A0A0).toInt())
+    private val transparent = MutableLiveData((0x00000000).toInt())
 
     fun parseStyleFromName(name: ColorStyles): MutableLiveData<Int> {
         return when(name) {
@@ -42,6 +44,7 @@ object ThemeHelper {
             ColorStyles.TEXT_SECONDARY -> textSecondary
             ColorStyles.TEXT_INVERSE -> textInverse
             ColorStyles.DIVIDER -> divider
+            ColorStyles.TRANSPARENT -> transparent
         }
     }
 

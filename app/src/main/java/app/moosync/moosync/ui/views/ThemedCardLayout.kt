@@ -18,11 +18,11 @@ class ThemedCardLayout(context: Context, attrs: AttributeSet?) : MaterialCardVie
     init {
         strokeWidth = 0
 
-        setRippleColorResource(R.color.transparent)
+//        setRippleColorResource(R.color.transparent)
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.ThemedCardLayout)
         colorStyle =
-            attributes.getColorStyle(R.styleable.ThemedFrameLayout_themeStyle, ColorStyles.PRIMARY)
+            attributes.getColorStyle(R.styleable.ThemedFrameLayout_themeStyle, ColorStyles.TRANSPARENT)
         setCustomColor(colorStyle)
         attributes.recycle()
     }

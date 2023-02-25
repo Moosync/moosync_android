@@ -9,6 +9,7 @@
         <enum name="textSecondary" value="5" />
         <enum name="textInverse" value="6" />
         <enum name="divider" value="7" />
+        <enum name="transparent" value="8" />
     </attr>
 
     <declare-styleable name="ThemedTextView">

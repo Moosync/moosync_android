@@ -31,22 +31,21 @@ class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapt
         }
     }
 
-    private fun showBorder(binding: SongListItemBinding) {
-        binding.background.strokeWidth = 1
-        binding.background.strokeColor = ColorStyles.ACCENT.getColor()
+    private fun cardSelected(binding: SongListItemBinding) {
+        binding.background.setCardBackgroundColor(ColorStyles.PRIMARY.getColor())
     }
 
-    private fun hideBorder(binding: SongListItemBinding) {
-        binding.background.strokeWidth = 0
+    private fun cardDeselected(binding: SongListItemBinding) {
+        binding.background.setCardBackgroundColor(ColorStyles.TRANSPARENT.getColor())
     }
 
     private fun toggleItemSelected(binding: SongListItemBinding, item: Song) {
         if (!selectedItems.contains(item._id)) {
             selectedItems.add(item._id)
-            showBorder(binding)
+            cardSelected(binding)
         } else {
             selectedItems.remove(item._id)
-            hideBorder(binding)
+            cardDeselected(binding)
         }
     }
 
@@ -55,9 +54,9 @@ class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapt
         binding.textView2.text = item.artist?.toArtistString() ?: ""
 
         if (selectedItems.contains(item._id)) {
-            showBorder(binding)
+            cardSelected(binding)
         } else {
-            hideBorder(binding)
+            cardDeselected(binding)
         }
 
         GlideApp
