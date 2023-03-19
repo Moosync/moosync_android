@@ -1,5 +1,6 @@
 package app.moosync.moosync.providers
 
+import android.content.Context
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Artist
 import app.moosync.moosync.utils.models.Playlist
@@ -18,7 +19,7 @@ import org.schabi.newpipe.extractor.downloader.Request
 import org.schabi.newpipe.extractor.downloader.Response
 import org.schabi.newpipe.extractor.stream.StreamInfoItem
 
-class YoutubeProvider : GenericProvider() {
+class YoutubeProvider(context: Context) : GenericProvider(context) {
 
     private val streamingService: StreamingService
 
@@ -49,9 +50,6 @@ class YoutubeProvider : GenericProvider() {
     private fun getChannelIdFromURL(url: String): String {
         return streamingService.channelLHFactory.getId(url)
     }
-
-
-
     override fun search(term: String): Deferred<ArrayList<Song>> {
         return CoroutineScope(Dispatchers.Default).async {
             val arrayList = ArrayList<Song>()

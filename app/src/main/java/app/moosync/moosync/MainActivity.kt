@@ -1,5 +1,6 @@
 package app.moosync.moosync
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
@@ -64,5 +65,10 @@ class MainActivity : BaseMainActivity() {
         Log.d("TAG", "onDestroy: Destroying main activity")
         getMediaRemote().release()
         super.onDestroy()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d(TAG, "onCreate: ${intent?.action} ${intent?.data}")
     }
 }
