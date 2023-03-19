@@ -25,9 +25,9 @@ class PlaylistsFragment: BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_songs_list, container, false)
         rootView = binding.root
 
-        setHeaderButtons(HeaderButtons("New Playlist", R.drawable.material_symbols_add_rounded) {
+        setHeaderButtons(HeaderButtons("New Playlist", R.drawable.material_symbols_add_rounded, {
             NewPlaylistDialog(requireContext()).show()
-        })
+        }))
 
         setToolbar(binding.root)
 

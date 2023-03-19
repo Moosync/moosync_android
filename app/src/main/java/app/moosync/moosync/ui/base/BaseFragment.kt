@@ -2,6 +2,7 @@ package app.moosync.moosync.ui.base
 
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
@@ -16,7 +17,12 @@ import app.moosync.moosync.utils.MediaServiceRemote
 import app.moosync.moosync.utils.helpers.margin
 import app.moosync.moosync.utils.services.interfaces.MediaControls
 
-data class HeaderButtons(var label: String, var drawable: Int, var onClick: OnClickListener? = null)
+enum class HeaderButtonTypes {
+    SEARCH,
+    IMAGE
+}
+
+data class HeaderButtons(var label: String, var drawable: Int, var onClick: OnClickListener? = null, var type: HeaderButtonTypes = HeaderButtonTypes.IMAGE)
 
 abstract class BaseFragment: Fragment() {
 
@@ -38,6 +44,14 @@ abstract class BaseFragment: Fragment() {
         return this.getMediaRemote()?.controls
     }
 
+    fun setHeaderVisibility(visibility: Int) {
+        if (!this::rootView.isInitialized) {
+            throw Error("Root view not initialized")
+        }
+        val songListHeader = rootView.findViewById<ThemedLinearLayout>(R.id.song_list_header_button_group)
+        songListHeader.visibility = visibility
+    }
+
     fun setHeaderButtons(vararg headerButtons: HeaderButtons) {
         if (!this::rootView.isInitialized) {
             throw Error("Root view not initialized")
@@ -45,20 +59,47 @@ abstract class BaseFragment: Fragment() {
         val songListHeader = rootView.findViewById<ThemedLinearLayout>(R.id.song_list_header_button_group)
 
         for ((index, button) in headerButtons.withIndex()) {
-            val imageButton = ImageButton(requireContext())
-            val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            imageButton.layoutParams = layoutParams
-            imageButton.tooltipText = button.label
-            imageButton.background = AppCompatResources.getDrawable(requireContext(), button.drawable)
 
-            if (button.onClick !== null) imageButton.setOnClickListener(button.onClick)
-
-            if (index != 0) {
-                imageButton.margin(16f)
+            if (button.type === HeaderButtonTypes.IMAGE) {
+                songListHeader.addView(createImageButton(button, index))
             }
 
-            songListHeader.addView(imageButton)
+            if (button.type === HeaderButtonTypes.SEARCH) {
+                button.onClick = null
+                val searchButton = createImageButton(button, index)
+
+                searchButton.setOnClickListener {
+                    val root = LinearLayout(requireContext())
+                    root.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                    root.orientation = LinearLayout.HORIZONTAL
+
+                    val editText = EditText(requireContext())
+                    editText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                    root.addView(editText)
+
+                    songListHeader.addView(root)
+                }
+
+
+                songListHeader.addView(searchButton)
+            }
         }
+    }
+
+    private fun createImageButton(button: HeaderButtons, index: Int): View {
+        val imageButton = ImageButton(requireContext())
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        imageButton.layoutParams = layoutParams
+        imageButton.tooltipText = button.label
+        imageButton.background = AppCompatResources.getDrawable(requireContext(), button.drawable)
+
+        if (button.onClick !== null) imageButton.setOnClickListener(button.onClick)
+
+        if (index != 0) {
+            imageButton.margin(16f)
+        }
+
+        return imageButton
     }
 
 

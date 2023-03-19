@@ -2,7 +2,7 @@ package app.moosync.moosync.ui.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import app.moosync.moosync.R
 import app.moosync.moosync.utils.helpers.ColorStyles
@@ -11,15 +11,15 @@ import app.moosync.moosync.utils.helpers.getColorStyle
 import app.moosync.moosync.utils.helpers.observe
 
 
-class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
-    LinearLayout(context, attrs) {
+class ThemedRelativeLayout(context: Context, attrs: AttributeSet?) :
+    RelativeLayout(context, attrs) {
 
     private val colorStyle: ColorStyles
 
     init {
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.ThemedLinearLayout)
+        val attributes = context.obtainStyledAttributes(attrs, R.styleable.ThemedRelativeLayout)
         colorStyle =
-            attributes.getColorStyle(R.styleable.ThemedLinearLayout_themeStyle, ColorStyles.PRIMARY)
+            attributes.getColorStyle(R.styleable.ThemedRelativeLayout_themeStyle, ColorStyles.PRIMARY)
         setCustomColor(colorStyle)
         attributes.recycle()
 
@@ -37,9 +37,5 @@ class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
             }
         }
         super.onAttachedToWindow()
-    }
-
-    override fun performClick(): Boolean {
-        return super.performClick()
     }
 }

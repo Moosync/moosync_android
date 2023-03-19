@@ -24,6 +24,10 @@
         <attr name="themeStyle"/>
     </declare-styleable>
 
+    <declare-styleable name="ThemedRelativeLayout">
+        <attr name="themeStyle"/>
+    </declare-styleable>
+
     <declare-styleable name="ThemedCardLayout">
         <attr name="themeStyle"/>
     </declare-styleable>
