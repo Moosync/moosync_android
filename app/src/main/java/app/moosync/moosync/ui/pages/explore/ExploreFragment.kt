@@ -19,6 +19,7 @@ class ExploreFragment: BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_explore, container, false)
         rootView = binding.root
 
+        setToolbar(binding.root)
         setHeaderVisibility(View.GONE)
 
         return rootView

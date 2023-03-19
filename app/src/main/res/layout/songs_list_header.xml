@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android" >
-    <app.moosync.moosync.ui.views.ThemedRelativeLayout
+    <app.moosync.moosync.ui.views.ThemedLinearLayout
+        android:id="@+id/song_list_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp">
+        android:layout_height="58dp"
+        android:paddingHorizontal="24dp">
 
         <app.moosync.moosync.ui.views.ThemedTextView
             android:id="@+id/song_list_title"
@@ -14,20 +14,17 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_centerVertical="true"
-            android:layout_gravity="start"
+            android:layout_gravity="start|center_vertical"
             android:text="@string/songs_header" />
 
         <app.moosync.moosync.ui.views.ThemedLinearLayout
             android:id="@+id/song_list_header_button_group"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/song_list_title"
+            android:layout_height="match_parent"
             android:gravity="end|center_vertical"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:orientation="horizontal">
 
         </app.moosync.moosync.ui.views.ThemedLinearLayout>
-    </app.moosync.moosync.ui.views.ThemedRelativeLayout>
+    </app.moosync.moosync.ui.views.ThemedLinearLayout>
 
 </layout>

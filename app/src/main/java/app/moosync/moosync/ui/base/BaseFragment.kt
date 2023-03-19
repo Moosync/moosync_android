@@ -48,7 +48,7 @@ abstract class BaseFragment: Fragment() {
         if (!this::rootView.isInitialized) {
             throw Error("Root view not initialized")
         }
-        val songListHeader = rootView.findViewById<ThemedLinearLayout>(R.id.song_list_header_button_group)
+        val songListHeader = rootView.findViewById<View>(R.id.song_list_header)
         songListHeader.visibility = visibility
     }
 
@@ -75,6 +75,8 @@ abstract class BaseFragment: Fragment() {
 
                     val editText = EditText(requireContext())
                     editText.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+                    editText.maxLines = 1
+                    editText.isSingleLine = true
                     root.addView(editText)
 
                     songListHeader.addView(root)
