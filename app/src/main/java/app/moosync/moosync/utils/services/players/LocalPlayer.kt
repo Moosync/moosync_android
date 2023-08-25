@@ -7,7 +7,8 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import java.util.*
+import android.util.Log
+import java.util.Timer
 
 
 class LocalPlayer : GenericPlayer() {
@@ -20,7 +21,14 @@ class LocalPlayer : GenericPlayer() {
     private var ignoreSongEnded = false
 
     override val isPlaying: Boolean
-        get() = playerInstance.isPlaying
+        get() {
+            try {
+                return playerInstance.isPlaying
+            } catch (e: Exception) {
+                Log.e("TAG", "Error getting isPlaying:", e)
+            }
+            return false
+        }
 
     private var isPlayerPrepared = false
     private val afterPreparedMethodCalls: MutableList<() -> Unit> = mutableListOf()
