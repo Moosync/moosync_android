@@ -6,14 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
+import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.SongItemAdapter
 import app.moosync.moosync.ui.base.BaseFragment
 import app.moosync.moosync.ui.base.HeaderButtons
-import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.viewModels.SongsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SongsList : BaseFragment() {
 
@@ -43,9 +46,16 @@ class SongsList : BaseFragment() {
 
         viewModel.getSongList().observe(viewLifecycleOwner) {
             val tmp = ArrayList(it)
-            tmp.add(0, Song.emptySong)
-            tmp.add(1, Song("youtube:gHzuabZUd6c", "youtube", 90, null, null, null, 0, "gHzuabZUd6c", null, PlayerTypes.YOUTUBE))
-            adapter.submitList(tmp)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val providers = (requireActivity() as MainActivity).providerStore.getAllProviders()
+                for (p in providers) {
+                    val songs = p.search("hello").await()
+                    p.getUserPlaylists().await()
+                    tmp.addAll(songs.songs)
+                    adapter.submitList(tmp)
+                }
+            }
         }
 
         return rootView

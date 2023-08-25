@@ -2,6 +2,7 @@ package app.moosync.moosync.providers
 
 import android.content.Context
 import app.moosync.moosync.utils.PlayerTypes
+import app.moosync.moosync.utils.helpers.OkHttpDownloader
 import app.moosync.moosync.utils.models.Artist
 import app.moosync.moosync.utils.models.Playlist
 import app.moosync.moosync.utils.models.Song
@@ -9,14 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.schabi.newpipe.extractor.NewPipe
 import org.schabi.newpipe.extractor.ServiceList
 import org.schabi.newpipe.extractor.StreamingService
-import org.schabi.newpipe.extractor.downloader.Downloader
-import org.schabi.newpipe.extractor.downloader.Request
-import org.schabi.newpipe.extractor.downloader.Response
 import org.schabi.newpipe.extractor.stream.StreamInfoItem
 
 class YoutubeProvider(context: Context) : GenericProvider(context) {
@@ -50,7 +46,7 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
     private fun getChannelIdFromURL(url: String): String {
         return streamingService.channelLHFactory.getId(url)
     }
-    override fun search(term: String): Deferred<ArrayList<Song>> {
+    override fun search(term: String): Deferred<SearchResponse> {
         return CoroutineScope(Dispatchers.Default).async {
             val arrayList = ArrayList<Song>()
 
@@ -69,14 +65,14 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
                             null,
                             System.currentTimeMillis(),
                             infoItem.url,
-                            infoItem.thumbnailUrl,
+                            infoItem.thumbnails[0]?.url,
                             PlayerTypes.YOUTUBE
                         )
                     )
                 }
             }
 
-            arrayList
+            SearchResponse(arrayList, arrayListOf(), arrayListOf(), arrayListOf())
         }
     }
 
@@ -84,23 +80,5 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
         return CoroutineScope(Dispatchers.Default).async {
             ArrayList()
         }
-    }
-}
-
-class OkHttpDownloader() : Downloader() {
-    override fun execute(request: Request): Response {
-        val body = request.dataToSend()?.toRequestBody()
-        val request =
-            okhttp3.Request.Builder().url(request.url()).method(request.httpMethod(), body).build()
-
-        val response = OkHttpClient().newCall(request).execute()
-
-        return Response(
-            response.code,
-            response.message,
-            response.headers.toMultimap(),
-            response.body?.string(),
-            response.request.url.toString()
-        )
     }
 }

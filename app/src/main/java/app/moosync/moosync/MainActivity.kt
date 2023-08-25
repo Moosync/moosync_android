@@ -13,6 +13,7 @@ import app.moosync.moosync.ui.handlers.MiniBarPlayerHandler
 import app.moosync.moosync.ui.handlers.NowPlayingHandler
 import app.moosync.moosync.utils.db.repository.SongRepository
 import app.moosync.moosync.utils.helpers.AudioScanner
+import app.moosync.moosync.utils.helpers.DeeplinkHandler
 import app.moosync.moosync.utils.helpers.PermissionManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
@@ -29,16 +30,20 @@ class MainActivity : BaseMainActivity() {
 
         setupOverlayPlayers()
 
+        CoroutineScope(Dispatchers.Main).launch {
+            val providers = providerStore.getAllProviders()
+            for (p in providers) {
+                p.login().await()
+            }
+        }
+
         PermissionManager(this).requestPermission {
             CoroutineScope(Dispatchers.IO).launch {
                 val songs = AudioScanner().readDirectory(this@MainActivity)
                 val repo = SongRepository(this@MainActivity)
                 repo.insert(*songs.map { it.toDatabaseEntity() }.toTypedArray())
 
-//                val ytSongs = YoutubeProvider().search("Bury the light").await()
-//                repo.insert(*ytSongs.map { it.toDatabaseEntity() }.toTypedArray())
-
-                Log.d("TAG", "onCreate: added songs")
+                Log.d(TAG, "onCreate: added songs")
             }
         }
 
@@ -70,5 +75,9 @@ class MainActivity : BaseMainActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.d(TAG, "onCreate: ${intent?.action} ${intent?.data}")
+        val data = intent?.data
+        if (data !== null) {
+            DeeplinkHandler.triggerCallback(data)
+        }
     }
 }

@@ -19,10 +19,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Moosynckotlin"
         tools:targetApi="31">
-        <activity
-            android:name=".DeepLinkActivity"
-            android:exported="true">
-        </activity>
 
         <service
             android:name=".utils.services.MediaPlayerService"
@@ -50,7 +46,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="oauth"
                     android:scheme="moosync" />
             </intent-filter>
         </activity>
