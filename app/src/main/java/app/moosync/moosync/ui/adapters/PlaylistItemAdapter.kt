@@ -25,7 +25,7 @@ class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : B
         binding.title.text = item.name
         binding.coverImage.setImageDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.ic_playlists))
 
-//        GlideApp
+//        Glide
 //            .with(binding.root.context)
 //            .load(AudioCover(item))
 //            .placeholder(R.drawable.songs)

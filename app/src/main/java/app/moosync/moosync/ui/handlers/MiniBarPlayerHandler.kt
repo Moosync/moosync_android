@@ -9,10 +9,10 @@ import androidx.core.animation.doOnEnd
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.NowPlayingMiniBarBinding
-import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
@@ -69,7 +69,7 @@ class MiniBarPlayerHandler(private val mainActivity: MainActivity, private val m
             progress = 0
         }
 
-        GlideApp
+        Glide
             .with(miniBarBinding.root.context)
             .load(currentSong.coverImage)
             .placeholder(R.drawable.songs)

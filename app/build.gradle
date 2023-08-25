@@ -57,8 +57,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // Glide
-    implementation 'com.github.bumptech.glide:glide:4.13.2'
-    ksp 'com.github.bumptech.glide:ksp:4.13.2'
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    ksp 'com.github.bumptech.glide:ksp:4.14.2'
 
     // JAudioTagger
     implementation('org.bitbucket.ijabz:jaudiotagger:2.2.5')

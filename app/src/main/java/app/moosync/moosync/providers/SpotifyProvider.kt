@@ -6,6 +6,7 @@ import android.net.Uri
 import android.net.Uri.Builder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import app.moosync.moosync.ui.base.BaseMainActivity
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.db.Secure
 import app.moosync.moosync.utils.helpers.DeeplinkHandler
@@ -146,6 +147,10 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
         TODO("Not yet implemented")
     }
 
+    override fun matches(id: String): Boolean {
+        return id.startsWith("spotify:")
+    }
+
     private fun parseArtists(vararg items: SpotifySearchResponse.SpotifyArtist): ArrayList<Artist>  {
         return items.map { a -> Artist("spotify:artist:${a.id}", a.name) } as ArrayList<Artist>
     }
@@ -220,6 +225,35 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
             )).await()
 
             parsePlaylists(*resp.items.toTypedArray())
+        }
+    }
+
+    override fun prePlaybackTransformation(song: Song): Deferred<Song?> {
+        return CoroutineScope(Dispatchers.Default).async {
+            if (context is BaseMainActivity) {
+                val youtubeProvider = context.providerStore.getProviderForId("youtube:")
+                if (youtubeProvider != null) {
+                    val searchResult =
+                        youtubeProvider.search("${song.artist?.joinToString(", ")} - ${song.title}")
+                            .await()
+                    val newSong = if (searchResult.songs.size > 0) searchResult.songs[0] else null
+                    if (newSong != null) {
+                        return@async Song(
+                            song._id,
+                            song.title,
+                            newSong.duration,
+                            song.artist,
+                            song.album,
+                            song.genre,
+                            song.modified,
+                            newSong.playbackUrl,
+                            song.coverImage,
+                            newSong.type
+                        )
+                    }
+                }
+            }
+            null
         }
     }
 }

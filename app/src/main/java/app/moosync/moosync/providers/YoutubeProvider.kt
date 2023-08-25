@@ -39,6 +39,10 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
         }
     }
 
+    override fun matches(id: String): Boolean {
+        return id.startsWith("youtube:")
+    }
+
     private fun getVideoIdFromURL(url: String): String {
         return streamingService.streamLHFactory.getId(url)
     }

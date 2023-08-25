@@ -12,9 +12,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import app.moosync.moosync.BuildConfig
 import app.moosync.moosync.R
-import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
@@ -94,7 +94,7 @@ class MediaSessionHandler(private val mContext: Context) {
 
             mMediaSession.setMetadata(builder.build())
 
-            GlideApp.with(mContext)
+            Glide.with(mContext)
                 .asBitmap()
                 .load(song.coverImage)
                 .signature(MediaStoreSignature("", song.modified, 0))

@@ -1,19 +1,18 @@
 package app.moosync.moosync.ui.handlers
 
 import android.graphics.PorterDuff
-import android.util.Log
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.NowPlayingLayoutBinding
-import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.ColorStyles
 import app.moosync.moosync.utils.helpers.getColor
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.helpers.toTimeString
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.interfaces.MediaPlayerCallbacks
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
 import kotlinx.coroutines.CoroutineScope
@@ -101,7 +100,7 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
         nowPlayingLayoutBinding.totalTime.text = currentSong.duration.toInt().toTimeString()
         nowPlayingLayoutBinding.currentTime.text = mainActivity.getString(R.string.zero_time)
 
-        GlideApp
+        Glide
             .with(nowPlayingLayoutBinding.root.context)
             .load(currentSong.coverImage)
             .placeholder(R.drawable.songs)
@@ -119,7 +118,6 @@ class NowPlayingHandler(private val mainActivity: MainActivity, private val nowP
             }
 
             override fun onTimeChange(time: Int) {
-                Log.d("TAG", "onTimeChange: $time")
                 if (!isSeeking) {
                     nowPlayingLayoutBinding.seekbar.progress = time
                     nowPlayingLayoutBinding.currentTime.text = time.toTimeString()

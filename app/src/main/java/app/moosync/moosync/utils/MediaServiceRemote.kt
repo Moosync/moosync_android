@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.IBinder
 import android.util.Log
+import app.moosync.moosync.MainActivity
 import app.moosync.moosync.utils.Constants.ACTION_FROM_MAIN_ACTIVITY
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.services.MediaPlayerService
@@ -140,6 +141,17 @@ class MediaServiceRemote private constructor(activity: Activity) {
         }
     }
 
+    fun playSong(song: Song) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val provider = (mContextWrapper.baseContext as MainActivity).providerStore.getProviderForId(song._id)
+            val transformedSong = provider?.prePlaybackTransformation(song)?.await()
+            Log.d("TAG", "playSong: got transformed song $transformedSong")
+            if (transformedSong != null) {
+                controls?.playSong(transformedSong)
+            }
+        }
+    }
+
     fun getCurrentSongAsync(scope: CoroutineScope): Deferred<Song?> {
         return runOrAddToQueueAsync(scope) {
             return@runOrAddToQueueAsync it.currentSong
@@ -176,7 +188,7 @@ class MediaServiceRemote private constructor(activity: Activity) {
             val prevIndex = it.currentIndex - 1
 
             val currentSong = it.currentSong
-            var nextSong = getValidSong(it.queue, nextIndex, true)
+            val nextSong = getValidSong(it.queue, nextIndex, true)
             val prevSong = getValidSong(it.queue, prevIndex, false)
 
             return@runOrAddToQueueAsync arrayOf(prevSong, currentSong, nextSong)

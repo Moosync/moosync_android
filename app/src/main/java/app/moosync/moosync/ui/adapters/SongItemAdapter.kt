@@ -3,11 +3,11 @@ package app.moosync.moosync.ui.adapters
 import androidx.recyclerview.widget.DiffUtil
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.SongListItemBinding
-import app.moosync.moosync.glide.GlideApp
 import app.moosync.moosync.utils.helpers.ColorStyles
 import app.moosync.moosync.utils.helpers.getColor
 import app.moosync.moosync.utils.helpers.toArtistString
 import app.moosync.moosync.utils.models.Song
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.MediaStoreSignature
@@ -59,7 +59,7 @@ class SongItemAdapter(private val onClick: (song: Song) -> Unit) : BaseListAdapt
             cardDeselected(binding)
         }
 
-        GlideApp
+        Glide
             .with(binding.root.context)
             .load(item.coverImage)
             .placeholder(R.drawable.songs)

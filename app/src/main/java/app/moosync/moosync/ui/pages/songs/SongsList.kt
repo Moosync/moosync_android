@@ -37,7 +37,8 @@ class SongsList : BaseFragment() {
             if (it == Song.emptySong) {
                 getMediaControls()?.stop()
             } else {
-                getMediaControls()?.playSong(it)
+                    getMediaRemote()?.playSong(it)
+
             }
         }
         binding.songsList.adapter = adapter

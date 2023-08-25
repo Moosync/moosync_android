@@ -17,4 +17,13 @@ class ProviderStore(private val context: Context) {
     fun getAllProviders(): ArrayList<GenericProvider> {
         return providers
     }
+
+    fun getProviderForId(id: String): GenericProvider? {
+        for (p in providers) {
+            if (p.matches(id)) {
+                return p
+            }
+        }
+        return null
+    }
 }
