@@ -41,10 +41,6 @@ class ThemedCardLayout(context: Context, attrs: AttributeSet?) : MaterialCardVie
         super.onAttachedToWindow()
     }
 
-    override fun performClick(): Boolean {
-        return super.performClick()
-    }
-
     fun getColor(): Int {
         return colorStyle.getColor()
     }

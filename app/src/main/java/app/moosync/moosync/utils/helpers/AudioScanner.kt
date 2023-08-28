@@ -1,5 +1,6 @@
 package app.moosync.moosync.utils.helpers
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
@@ -17,7 +18,7 @@ class AudioScanner {
     fun readDirectory(mContext: Context): ArrayList<Song> {
         val songList: ArrayList<Song> = ArrayList()
 
-        val proj = arrayOf(
+        val proj = arrayListOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.ALBUM,
@@ -25,14 +26,18 @@ class AudioScanner {
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST_ID,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.GENRE,
-            MediaStore.Audio.Media.GENRE_ID,
             MediaStore.Audio.Media.IS_MUSIC,
             MediaStore.Audio.Media.DATE_MODIFIED,
         )
+
+        if (android.os.Build.VERSION.SDK_INT >= 30) {
+            proj.add(MediaStore.Audio.Media.GENRE)
+            proj.add(MediaStore.Audio.Media.GENRE_ID)
+        }
+
         val cursor = mContext.contentResolver.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            proj,
+            proj.toTypedArray(),
             null,
             null,
             MediaStore.Audio.Media.DEFAULT_SORT_ORDER
@@ -80,7 +85,7 @@ class AudioScanner {
             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
 
         if (artistId != 0L) {
-            return listOf(Artist(artistId.toString(), artistName))
+            return listOf(Artist(artistId.toString(), artistName, null))
         }
         return null
     }
@@ -95,13 +100,17 @@ class AudioScanner {
         return null
     }
 
+    @SuppressLint("InlinedApi")
     private fun getGenre(cursor: Cursor): List<Genre>? {
-        val genreId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE_ID))
-        val genreName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
+        val genreIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media.GENRE_ID)
+        if (genreIdIndex >= 0) {
+            val genreId = cursor.getLong(genreIdIndex)
+            val genreName =
+                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
 
-        if (genreId != 0L) {
-            return listOf(Genre(genreId.toString(), genreName))
-
+            if (genreId != 0L) {
+                return listOf(Genre(genreId.toString(), genreName))
+            }
         }
         return null
     }

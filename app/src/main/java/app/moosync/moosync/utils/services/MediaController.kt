@@ -79,15 +79,15 @@ class MediaController(private val mContext: Context, private val foregroundServi
             when (newState) {
                 PlaybackState.PLAYING -> {
                     playbackManager.play()
-                    emitInAllCallbacks() {it.onPlay()}
+                    emitInAllCallbacks {it.onPlay()}
                 }
                 PlaybackState.PAUSED -> {
                     playbackManager.pause()
-                    emitInAllCallbacks() {it.onPause()}
+                    emitInAllCallbacks {it.onPause()}
                 }
                 PlaybackState.STOPPED -> {
                     playbackManager.stop()
-                    emitInAllCallbacks() {it.onStop()}
+                    emitInAllCallbacks {it.onStop()}
                 }
             }
             playerState = newState

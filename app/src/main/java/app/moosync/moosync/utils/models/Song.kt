@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import java.io.Serializable
 
 
-data class Artist(val id: String, val name: String): Serializable
+data class Artist(val id: String, val name: String, val coverImage: Any?): Serializable
 data class Album(val id: String, val name: String): Serializable
 data class Genre(val id: String, val name: String): Serializable
 data class Song(
@@ -32,10 +32,10 @@ data class Song(
         return super.equals(other)
     }
 
-    private fun serializeCoverImage(): String? {
-        if (coverImage != null) {
-            val prefix = coverImage::class.java.name
-            return "$prefix:${Gson().toJson(coverImage)}"
+    private fun serializeCoverImage(coverImg: Any?): String? {
+        if (coverImg != null) {
+            val prefix = coverImg::class.java.name
+            return "$prefix:${Gson().toJson(coverImg)}"
         }
         return null
     }
@@ -49,17 +49,31 @@ data class Song(
                 albumId = album?.id,
                 dateModified = modified,
                 playbackUrl = playbackUrl,
-                coverImage = serializeCoverImage(),
+                coverImage = serializeCoverImage(coverImage),
                 type = type
             ),
             albums = album?.let { AlbumEntity(it.id, it.name) },
             artists = artist?.map {
-                ArtistEntity(it.id, it.name)
+                ArtistEntity(it.id, it.name, serializeCoverImage(it.coverImage))
             },
             genres = genre?.map {
                 GenreEntity(it.id, it.name)
             }
         )
+    }
+
+    override fun hashCode(): Int {
+        var result = _id.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + duration.hashCode()
+        result = 31 * result + (artist?.hashCode() ?: 0)
+        result = 31 * result + (album?.hashCode() ?: 0)
+        result = 31 * result + (genre?.hashCode() ?: 0)
+        result = 31 * result + modified.hashCode()
+        result = 31 * result + (playbackUrl?.hashCode() ?: 0)
+        result = 31 * result + (coverImage?.hashCode() ?: 0)
+        result = 31 * result + type.hashCode()
+        return result
     }
 
     companion object {
@@ -96,7 +110,7 @@ data class Song(
                 playbackUrl = item.song.playbackUrl,
                 type = item.song.type,
                 album = item.albums?.let { Album(it._id, it.name) },
-                artist = item.artists?.map { Artist(it._id, it.name) },
+                artist = item.artists?.map { Artist(it._id, it.name, it.coverImage) },
                 genre = item.genres?.map { Genre(it._id, it.name) },
                 coverImage = parseCoverImage(item.song.coverImage),
             )

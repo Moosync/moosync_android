@@ -12,6 +12,8 @@ class ArtistEntity(
     val _id: String,
 
     @ColumnInfo("name")
-    val name: String
+    val name: String,
 
+    @ColumnInfo("coverImage")
+    val coverImage: String?
 )

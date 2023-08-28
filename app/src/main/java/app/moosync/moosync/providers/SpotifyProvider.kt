@@ -153,7 +153,7 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
     }
 
     private fun parseArtists(vararg items: SpotifySearchResponse.SpotifyArtist): ArrayList<Artist>  {
-        return items.map { a -> Artist("spotify:artist:${a.id}", a.name) } as ArrayList<Artist>
+        return items.map { a -> Artist("spotify:artist:${a.id}", a.name, if (a.images?.isNotEmpty() == true) a.images[0].url else null) } as ArrayList<Artist>
     }
 
     private fun parseAlbums(vararg items: SpotifySearchResponse.SpotifyAlbum): ArrayList<Album> {
@@ -247,7 +247,6 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
             val songList: ArrayList<Song> = arrayListOf()
             if (loggedIn) {
                 val parsedPlaylistId = playlist.id?.substring(17)
-                Log.d(TAG, "getPlaylistItems: $parsedPlaylistId")
                 if (!parsedPlaylistId.isNullOrBlank()) {
                     val resp = get(
                         SpotifyPlaylistItemResponse::class.java,

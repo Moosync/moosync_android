@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import app.moosync.moosync.BuildConfig
 
 @Database(
-    version = 4,
+    version = 5,
     entities = [
         SongEntity::class,
         ArtistEntity::class,

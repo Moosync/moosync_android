@@ -62,7 +62,7 @@ data class SpotifySearchResponse(
         val genres: List<String>,
         val href: String,
         val id: String,
-        val images: List<Image>,
+        val images: List<Image>?,
         val name: String,
         val popularity: Int,
         val type: String,

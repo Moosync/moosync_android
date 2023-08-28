@@ -39,7 +39,4 @@ class ThemedLinearLayout(context: Context, attrs: AttributeSet?) :
         super.onAttachedToWindow()
     }
 
-    override fun performClick(): Boolean {
-        return super.performClick()
-    }
 }
