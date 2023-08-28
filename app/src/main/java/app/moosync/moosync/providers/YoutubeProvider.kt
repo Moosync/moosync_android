@@ -30,13 +30,13 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
 
     override fun login(): Deferred<Unit> {
         return CoroutineScope(Dispatchers.Default).async {
-            true
+
         }
     }
 
     override fun signOut(): Deferred<Unit> {
         return CoroutineScope(Dispatchers.Default).async {
-            true
+
         }
     }
 
