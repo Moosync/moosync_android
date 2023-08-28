@@ -2,7 +2,7 @@ package app.moosync.moosync.utils.responses.spotify
 
 data class SpotifyUserPlaylistResponse(
     val href: String,
-    val items: List<Item>,
+    val items: List<Item>?,
     val limit: Int,
     val next: String,
     val offset: Int,

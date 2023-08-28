@@ -3,6 +3,7 @@ package app.moosync.moosync.providers
 import android.content.Context
 import app.moosync.moosync.utils.PlayerTypes
 import app.moosync.moosync.utils.helpers.OkHttpDownloader
+import app.moosync.moosync.utils.models.Album
 import app.moosync.moosync.utils.models.Artist
 import app.moosync.moosync.utils.models.Playlist
 import app.moosync.moosync.utils.models.Song
@@ -81,6 +82,24 @@ class YoutubeProvider(context: Context) : GenericProvider(context) {
     }
 
     override fun getUserPlaylists(): Deferred<ArrayList<Playlist>> {
+        return CoroutineScope(Dispatchers.Default).async {
+            ArrayList()
+        }
+    }
+
+    override fun getPlaylistItems(playlist: Playlist): Deferred<ArrayList<Song>> {
+        return CoroutineScope(Dispatchers.Default).async {
+            ArrayList()
+        }
+    }
+
+    override fun getArtistItems(artist: Artist): Deferred<ArrayList<Song>> {
+        return CoroutineScope(Dispatchers.Default).async {
+            ArrayList()
+        }
+    }
+
+    override fun getAlbumItems(album: Album): Deferred<ArrayList<Song>> {
         return CoroutineScope(Dispatchers.Default).async {
             ArrayList()
         }

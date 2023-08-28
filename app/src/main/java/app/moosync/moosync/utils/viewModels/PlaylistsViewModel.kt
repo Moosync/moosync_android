@@ -14,7 +14,7 @@ class PlaylistsViewModel(application: Application) : AndroidViewModel(applicatio
         it.toPlaylists()
     }
 
-    fun getSongList(): LiveData<List<Playlist>> {
+    fun getPlaylistList(): LiveData<List<Playlist>> {
         return playlistList
     }
 }

@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.gildor.coroutines.okhttp.await
 
-fun <T>get(json: Class<T>, baseUrl: String, path: String, query: Map<String, Any>, headers: Map<String, String> = emptyMap()): Deferred<T> {
+fun <T>get(json: Class<T>, baseUrl: String, path: String, query: Map<String, Any> = emptyMap(), headers: Map<String, String> = emptyMap()): Deferred<T> {
     return CoroutineScope(Dispatchers.Default).async {
         val uriBuilder = Uri.Builder()
             .scheme("https")
@@ -34,7 +34,7 @@ fun <T>get(json: Class<T>, baseUrl: String, path: String, query: Map<String, Any
             headersParsed.add(h.key, h.value)
         }
 
-        Log.d("TAG", "postForm: Sending GET request to ${uriBuilder.build()}")
+        Log.d("TAG", "get: Sending GET request to ${uriBuilder.build()}")
 
         val request =
             Request.Builder().url(uriBuilder.build().toString()).headers(headersParsed.build())

@@ -17,6 +17,7 @@ import app.moosync.moosync.utils.models.Artist
 import app.moosync.moosync.utils.models.Playlist
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.responses.spotify.SpotifyAccessTokenResponse
+import app.moosync.moosync.utils.responses.spotify.SpotifyPlaylistItemResponse
 import app.moosync.moosync.utils.responses.spotify.SpotifySearchResponse
 import app.moosync.moosync.utils.responses.spotify.SpotifyUserPlaylistResponse
 import kotlinx.coroutines.CoroutineScope
@@ -177,7 +178,7 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
     }
     
     private fun parsePlaylists(vararg items: SpotifyUserPlaylistResponse.Item): ArrayList<Playlist> {
-        return items.map { Playlist(it.id, it.name) } as ArrayList<Playlist>
+        return items.map { Playlist("spotify:playlist:${it.id}", it.name, if (it.images.isNotEmpty()) it.images[0].url else null) } as ArrayList<Playlist>
     }
 
     override fun search(term: String): Deferred<SearchResponse> {
@@ -197,19 +198,19 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
                     "Authorization" to "Bearer $accessToken"
                 )).await()
 
-                if (resp.tracks.items.isNotEmpty()) {
+                if (resp.tracks?.items?.isNotEmpty() == true) {
                     songList.addAll(parseSongs(*resp.tracks.items.toTypedArray()))
                 }
 
-                if (resp.albums.items.isNotEmpty()) {
+                if (resp.albums?.items?.isNotEmpty() == true) {
                     albumList.addAll(parseAlbums(*resp.albums.items.toTypedArray()))
                 }
 
-                if (resp.artists.items.isNotEmpty()) {
+                if (resp.artists?.items?.isNotEmpty() == true) {
                     artistList.addAll(parseArtists(*resp.artists.items.toTypedArray()))
                 }
                 
-                if (resp.playlists.items.isNotEmpty()) {
+                if (resp.playlists?.items?.isNotEmpty() == true) {
                     playlistList.addAll(parsePlaylists(*resp.playlists.items.toTypedArray()))
                 }
             }
@@ -220,12 +221,61 @@ class SpotifyProvider(context: Context): GenericProvider(context) {
 
     override fun getUserPlaylists(): Deferred<ArrayList<Playlist>> {
         return CoroutineScope(Dispatchers.Default).async {
-            val resp = get(SpotifyUserPlaylistResponse::class.java, API_BASE_URL, "v1/me/playlists", mapOf("limit" to 50), mapOf(
-                "Authorization" to "Bearer $accessToken"
-            )).await()
+            val playlistList: ArrayList<Playlist> = arrayListOf()
+            if (loggedIn) {
+                val resp = get(
+                    SpotifyUserPlaylistResponse::class.java,
+                    API_BASE_URL,
+                    "v1/me/playlists",
+                    mapOf("limit" to 50),
+                    mapOf(
+                        "Authorization" to "Bearer $accessToken"
+                    )
+                ).await()
 
-            parsePlaylists(*resp.items.toTypedArray())
+                if (resp.items?.isNotEmpty() == true) {
+                     playlistList.addAll(parsePlaylists(*resp.items.toTypedArray()))
+                }
+            }
+
+            playlistList
         }
+    }
+
+    override fun getPlaylistItems(playlist: Playlist): Deferred<ArrayList<Song>> {
+        return CoroutineScope(Dispatchers.Default).async {
+            val songList: ArrayList<Song> = arrayListOf()
+            if (loggedIn) {
+                val parsedPlaylistId = playlist.id?.substring(17)
+                Log.d(TAG, "getPlaylistItems: $parsedPlaylistId")
+                if (!parsedPlaylistId.isNullOrBlank()) {
+                    val resp = get(
+                        SpotifyPlaylistItemResponse::class.java,
+                        API_BASE_URL,
+                        "v1/playlists/${parsedPlaylistId}/tracks",
+                        emptyMap(),
+                        mapOf(
+                            "Authorization" to "Bearer $accessToken"
+                        )
+                    ).await()
+
+
+                    if (resp.items?.isNotEmpty() == true) {
+                        songList.addAll(parseSongs(*resp.items.map { it.track }.toTypedArray()))
+                    }
+                }
+            }
+
+            songList
+        }
+    }
+
+    override fun getArtistItems(artist: Artist): Deferred<ArrayList<Song>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAlbumItems(album: Album): Deferred<ArrayList<Song>> {
+        TODO("Not yet implemented")
     }
 
     override fun prePlaybackTransformation(song: Song): Deferred<Song?> {

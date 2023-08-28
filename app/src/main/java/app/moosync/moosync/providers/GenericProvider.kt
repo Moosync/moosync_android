@@ -25,4 +25,8 @@ abstract class GenericProvider(protected val context: Context) {
 
     abstract fun search(term: String): Deferred<SearchResponse>
     abstract fun getUserPlaylists(): Deferred<ArrayList<Playlist>>
+
+    abstract fun getPlaylistItems(playlist: Playlist): Deferred<ArrayList<Song>>
+    abstract fun getArtistItems(artist: Artist): Deferred<ArrayList<Song>>
+    abstract  fun getAlbumItems(album: Album): Deferred<ArrayList<Song>>
 }

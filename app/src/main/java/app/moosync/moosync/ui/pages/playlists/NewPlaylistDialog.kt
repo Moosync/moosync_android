@@ -23,7 +23,8 @@ class NewPlaylistDialog(context: Context) : Dialog(context) {
             SongRepository(context).insertPlaylist(
                 Playlist(
                     null,
-                    binding.playlistTitle.text.toString()
+                    binding.playlistTitle.text.toString(),
+                    null
                 )
             )
             dismiss()

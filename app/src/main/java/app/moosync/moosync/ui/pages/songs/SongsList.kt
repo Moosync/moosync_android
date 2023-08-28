@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import app.moosync.moosync.MainActivity
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.FragmentSongsListBinding
 import app.moosync.moosync.ui.adapters.SongItemAdapter
@@ -14,9 +13,6 @@ import app.moosync.moosync.ui.base.BaseFragment
 import app.moosync.moosync.ui.base.HeaderButtons
 import app.moosync.moosync.utils.models.Song
 import app.moosync.moosync.utils.viewModels.SongsViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class SongsList : BaseFragment() {
 
@@ -47,16 +43,7 @@ class SongsList : BaseFragment() {
 
         viewModel.getSongList().observe(viewLifecycleOwner) {
             val tmp = ArrayList(it)
-
-            CoroutineScope(Dispatchers.Main).launch {
-                val providers = (requireActivity() as MainActivity).providerStore.getAllProviders()
-                for (p in providers) {
-                    val songs = p.search("hello").await()
-                    p.getUserPlaylists().await()
-                    tmp.addAll(songs.songs)
-                    adapter.submitList(tmp)
-                }
-            }
+            adapter.submitList(tmp)
         }
 
         return rootView

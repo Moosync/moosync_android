@@ -6,13 +6,15 @@ import java.util.UUID
 
 data class Playlist(
     val id: String?,
-    val name: String
+    val name: String,
+    val coverImage: String?
 ): Serializable {
 
     fun toDatabaseEntity(): PlaylistEntity {
         return PlaylistEntity(
             id = id ?: UUID.randomUUID().toString(),
-            name = name
+            name = name,
+            coverImage = coverImage
         )
     }
 
@@ -20,7 +22,8 @@ data class Playlist(
         fun fromDatabaseEntity(item: PlaylistEntity): Playlist {
             return Playlist(
                 id = item.id,
-                name = item.name
+                name = item.name,
+                coverImage = item.coverImage
             )
         }
     }

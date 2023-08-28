@@ -1,14 +1,14 @@
 package app.moosync.moosync.utils.responses.spotify
 
 data class SpotifySearchResponse(
-    val albums: Albums,
-    val artists: Artists,
-    val playlists: Playlists,
-    val tracks: TracksX
+    val albums: Albums?,
+    val artists: Artists?,
+    val playlists: Playlists?,
+    val tracks: TracksX?
 ) {
     data class Albums(
         val href: String,
-        val items: List<SpotifyAlbum>,
+        val items: List<SpotifyAlbum>?,
         val limit: Int,
         val next: String,
         val offset: Int,
@@ -18,7 +18,7 @@ data class SpotifySearchResponse(
 
     data class Artists(
         val href: String,
-        val items: List<SpotifyArtist>,
+        val items: List<SpotifyArtist>?,
         val limit: Int,
         val next: String,
         val offset: Int,

@@ -1,18 +1,22 @@
 package app.moosync.moosync.ui.adapters
 
-import androidx.appcompat.content.res.AppCompatResources
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import app.moosync.moosync.R
 import app.moosync.moosync.databinding.PlaylistListItemBinding
 import app.moosync.moosync.utils.models.Playlist
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
-class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : BaseListAdapter<PlaylistListItemBinding, Playlist>(SongDiffCallback) {
+class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : BaseListAdapter<PlaylistListItemBinding, Playlist>(PlaylistDiffCallback) {
 
     override val layoutId: Int
         get() = R.layout.playlist_list_item
 
-    object SongDiffCallback : DiffUtil.ItemCallback<Playlist>() {
+    object PlaylistDiffCallback : DiffUtil.ItemCallback<Playlist>() {
         override fun areItemsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
+            Log.d("TAG", "areItemsTheSame: $oldItem, $newItem")
             return oldItem == newItem
         }
 
@@ -23,15 +27,14 @@ class PlaylistItemAdapter(private val onClick: (playlist: Playlist) -> Unit) : B
 
     override fun bind(binding: PlaylistListItemBinding, item: Playlist) {
         binding.title.text = item.name
-        binding.coverImage.setImageDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.ic_playlists))
 
-//        Glide
-//            .with(binding.root.context)
-//            .load(AudioCover(item))
-//            .placeholder(R.drawable.songs)
-//            .transform(CenterCrop(), RoundedCorners(16))
-//            .signature(MediaStoreSignature("", item.modified, 0))
-//            .into(binding.coverImage)
+        Glide
+            .with(binding.root.context)
+            .load(item.coverImage)
+            .placeholder(R.drawable.ic_playlists)
+            .transform(CenterCrop(), RoundedCorners(16))
+            .into(binding.coverImage)
+
 
         binding.root.setOnClickListener {
             onClick(item)
